@@ -1,0 +1,439 @@
+package compilador;
+
+import java.awt.Color;
+
+public class IDE extends javax.swing.JFrame 
+{
+    Linea numeroLinea;
+    Directorio direc;
+    
+    public IDE() 
+    {
+        initComponents();
+        setResizable(false);
+        setExtendedState(MAXIMIZED_BOTH);
+        getContentPane().setBackground(new Color(36,38,48));
+        
+        Iniciar();
+    }
+
+
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        lblNew = new javax.swing.JLabel();
+        lblOpen = new javax.swing.JLabel();
+        lblSave = new javax.swing.JLabel();
+        lblSaveAs = new javax.swing.JLabel();
+        lblRun = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTPCodigo = new javax.swing.JTextPane();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTPLexico = new javax.swing.JTextPane();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTPSintactico = new javax.swing.JTextPane();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jTPCodInt = new javax.swing.JTextPane();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        jTPError = new javax.swing.JTextPane();
+        menuBar = new javax.swing.JMenuBar();
+        menuArchivo = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        jMenuItem4 = new javax.swing.JMenuItem();
+        menuCompilar = new javax.swing.JMenu();
+        jMenuItem5 = new javax.swing.JMenuItem();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        lblNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/newFile.png"))); // NOI18N
+        lblNew.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+        lblNew.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        lblNew.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblNewMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                lblNewMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                lblNewMouseExited(evt);
+            }
+        });
+
+        lblOpen.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblOpen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/openFile.png"))); // NOI18N
+        lblOpen.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        lblOpen.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        lblOpen.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblOpenMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                lblOpenMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                lblOpenMouseExited(evt);
+            }
+        });
+
+        lblSave.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/save.png"))); // NOI18N
+        lblSave.setToolTipText("");
+        lblSave.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        lblSave.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        lblSave.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblSaveMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                lblSaveMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                lblSaveMouseExited(evt);
+            }
+        });
+
+        lblSaveAs.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblSaveAs.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/saveAs.png"))); // NOI18N
+        lblSaveAs.setToolTipText("");
+        lblSaveAs.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        lblSaveAs.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        lblSaveAs.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblSaveAsMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                lblSaveAsMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                lblSaveAsMouseExited(evt);
+            }
+        });
+
+        lblRun.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblRun.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/run.png"))); // NOI18N
+        lblRun.setToolTipText("");
+        lblRun.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        lblRun.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        lblRun.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                lblRunMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                lblRunMouseExited(evt);
+            }
+        });
+
+        jTPCodigo.setBackground(new java.awt.Color(36, 38, 48));
+        jTPCodigo.setFont(new java.awt.Font("Bahnschrift", 0, 14)); // NOI18N
+        jTPCodigo.setForeground(new java.awt.Color(255, 255, 255));
+        jScrollPane1.setViewportView(jTPCodigo);
+
+        jTPLexico.setEditable(false);
+        jTPLexico.setBackground(new java.awt.Color(36, 38, 48));
+        jTPLexico.setFont(new java.awt.Font("Bahnschrift", 0, 14)); // NOI18N
+        jTPLexico.setForeground(new java.awt.Color(255, 255, 255));
+        jScrollPane2.setViewportView(jTPLexico);
+
+        jScrollPane3.setBackground(new java.awt.Color(36, 38, 48));
+        jScrollPane3.setForeground(new java.awt.Color(255, 255, 255));
+
+        jTPSintactico.setEditable(false);
+        jTPSintactico.setBackground(new java.awt.Color(36, 38, 48));
+        jTPSintactico.setFont(new java.awt.Font("Bahnschrift", 0, 14)); // NOI18N
+        jTPSintactico.setForeground(new java.awt.Color(255, 255, 255));
+        jScrollPane3.setViewportView(jTPSintactico);
+
+        jTPCodInt.setEditable(false);
+        jTPCodInt.setBackground(new java.awt.Color(36, 38, 48));
+        jTPCodInt.setFont(new java.awt.Font("Bahnschrift", 0, 14)); // NOI18N
+        jTPCodInt.setForeground(new java.awt.Color(255, 255, 255));
+        jScrollPane4.setViewportView(jTPCodInt);
+
+        jLabel1.setFont(new java.awt.Font("Bahnschrift", 1, 18)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setText("LÉXICO");
+
+        jLabel2.setFont(new java.awt.Font("Bahnschrift", 1, 18)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setText("SINTÁCTICO");
+
+        jLabel3.setFont(new java.awt.Font("Bahnschrift", 1, 18)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setText("CÓDIGO INTERMEDIO");
+
+        jLabel4.setFont(new java.awt.Font("Bahnschrift", 1, 18)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel4.setText("ERROR");
+
+        jTPError.setEditable(false);
+        jTPError.setBackground(new java.awt.Color(36, 38, 48));
+        jTPError.setFont(new java.awt.Font("Bahnschrift", 0, 14)); // NOI18N
+        jTPError.setForeground(new java.awt.Color(255, 255, 255));
+        jScrollPane5.setViewportView(jTPError);
+
+        menuBar.setForeground(new java.awt.Color(36, 38, 48));
+        menuBar.setFont(new java.awt.Font("Bahnschrift", 0, 14)); // NOI18N
+
+        menuArchivo.setForeground(new java.awt.Color(36, 38, 48));
+        menuArchivo.setText("Archivo");
+        menuArchivo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        menuArchivo.setFont(new java.awt.Font("Bahnschrift", 0, 14)); // NOI18N
+        menuArchivo.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+
+        jMenuItem1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/newFileOp.png"))); // NOI18N
+        jMenuItem1.setText("Nuevo archivo");
+        menuArchivo.add(jMenuItem1);
+
+        jMenuItem2.setText("Abrir");
+        menuArchivo.add(jMenuItem2);
+
+        jMenuItem3.setText("Guardar");
+        menuArchivo.add(jMenuItem3);
+
+        jMenuItem4.setText("Guardar como...");
+        menuArchivo.add(jMenuItem4);
+
+        menuBar.add(menuArchivo);
+
+        menuCompilar.setForeground(new java.awt.Color(36, 38, 48));
+        menuCompilar.setText("Compilar");
+        menuCompilar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        menuCompilar.setFont(new java.awt.Font("Bahnschrift", 0, 14)); // NOI18N
+
+        jMenuItem5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/runOp.png"))); // NOI18N
+        jMenuItem5.setText("Compilar proyecto");
+        menuCompilar.add(jMenuItem5);
+
+        menuBar.add(menuCompilar);
+
+        setJMenuBar(menuBar);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblNew, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblOpen, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblSave, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblSaveAs, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblRun, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 810, Short.MAX_VALUE)
+                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane5))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 540, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 540, Short.MAX_VALUE)
+                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 540, Short.MAX_VALUE)
+                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(477, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblRun, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblSaveAs, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblSave, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblOpen, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblNew, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
+                    .addComponent(jScrollPane5))
+                .addContainerGap(65, Short.MAX_VALUE))
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void lblNewMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblNewMouseEntered
+        lblNew.setOpaque(true);
+        lblNew.setBackground(new Color(96,102,133));
+    }//GEN-LAST:event_lblNewMouseEntered
+
+    private void lblNewMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblNewMouseExited
+        lblNew.setOpaque(false);
+        lblNew.setBackground(new Color(36,38,48));
+    }//GEN-LAST:event_lblNewMouseExited
+
+    private void lblOpenMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblOpenMouseEntered
+        lblOpen.setOpaque(true);
+        lblOpen.setBackground(new Color(96,102,133));
+    }//GEN-LAST:event_lblOpenMouseEntered
+
+    private void lblOpenMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblOpenMouseExited
+        lblOpen.setOpaque(false);
+        lblOpen.setBackground(new Color(36,38,48));
+    }//GEN-LAST:event_lblOpenMouseExited
+
+    private void lblSaveMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblSaveMouseEntered
+       lblSave.setOpaque(true);
+       lblSave.setBackground(new Color(96,102,133));
+    }//GEN-LAST:event_lblSaveMouseEntered
+
+    private void lblSaveMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblSaveMouseExited
+        lblSave.setOpaque(false);
+        lblSave.setBackground(new Color(36,38,48));
+    }//GEN-LAST:event_lblSaveMouseExited
+
+    private void lblSaveAsMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblSaveAsMouseEntered
+        lblSaveAs.setOpaque(true);
+        lblSaveAs.setBackground(new Color(96,102,133));
+    }//GEN-LAST:event_lblSaveAsMouseEntered
+
+    private void lblSaveAsMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblSaveAsMouseExited
+        lblSaveAs.setOpaque(false);
+        lblSaveAs.setBackground(new Color(36,38,48));
+    }//GEN-LAST:event_lblSaveAsMouseExited
+
+    private void lblRunMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblRunMouseEntered
+        lblRun.setOpaque(true);
+        lblRun.setBackground(new Color(96,102,133));
+    }//GEN-LAST:event_lblRunMouseEntered
+
+    private void lblRunMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblRunMouseExited
+        lblRun.setOpaque(false);
+        lblRun.setBackground(new Color(36,38,48));
+    }//GEN-LAST:event_lblRunMouseExited
+
+    private void lblNewMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblNewMouseClicked
+        direc.Nuevo(this);
+        clearAllComp();
+    }//GEN-LAST:event_lblNewMouseClicked
+
+    private void lblOpenMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblOpenMouseClicked
+        direc.Abrir(this);
+        clearAllComp();
+    }//GEN-LAST:event_lblOpenMouseClicked
+
+    private void lblSaveMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblSaveMouseClicked
+        direc.Guardar(this);
+        clearAllComp();
+    }//GEN-LAST:event_lblSaveMouseClicked
+
+    private void lblSaveAsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblSaveAsMouseClicked
+        direc.guardarC(this);
+        clearAllComp();
+    }//GEN-LAST:event_lblSaveAsMouseClicked
+
+    private void Iniciar()
+    {
+        direc = new Directorio();
+        setTitle("#YURIDE");
+        String[] options = new String[] {"Guardar y continuar", "Descartar"};
+        
+        numeroLinea = new Linea(jTPCodigo);
+        jScrollPane1.setRowHeaderView(numeroLinea);
+    }
+    
+    public void clearAllComp()
+    {
+        jTPLexico.setText("");
+        jTPSintactico.setText("");
+        jTPCodInt.setText("");
+        jTPError.setText("");
+    }
+    
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(IDE.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(IDE.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(IDE.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(IDE.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new IDE().setVisible(true);
+            }
+        });
+    }        
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
+    private javax.swing.JMenuItem jMenuItem5;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JTextPane jTPCodInt;
+    public javax.swing.JTextPane jTPCodigo;
+    private javax.swing.JTextPane jTPError;
+    private javax.swing.JTextPane jTPLexico;
+    private javax.swing.JTextPane jTPSintactico;
+    private javax.swing.JLabel lblNew;
+    private javax.swing.JLabel lblOpen;
+    private javax.swing.JLabel lblRun;
+    private javax.swing.JLabel lblSave;
+    private javax.swing.JLabel lblSaveAs;
+    private javax.swing.JMenu menuArchivo;
+    private javax.swing.JMenuBar menuBar;
+    private javax.swing.JMenu menuCompilar;
+    // End of variables declaration//GEN-END:variables
+}
