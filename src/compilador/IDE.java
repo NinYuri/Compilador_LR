@@ -132,13 +132,13 @@ public class IDE extends javax.swing.JFrame
         });
 
         jTPCodigo.setBackground(new java.awt.Color(36, 38, 48));
-        jTPCodigo.setFont(new java.awt.Font("Bahnschrift", 0, 14)); // NOI18N
+        jTPCodigo.setFont(new java.awt.Font("Bahnschrift", 0, 18)); // NOI18N
         jTPCodigo.setForeground(new java.awt.Color(255, 255, 255));
         jScrollPane1.setViewportView(jTPCodigo);
 
         jTPLexico.setEditable(false);
         jTPLexico.setBackground(new java.awt.Color(36, 38, 48));
-        jTPLexico.setFont(new java.awt.Font("Bahnschrift", 0, 14)); // NOI18N
+        jTPLexico.setFont(new java.awt.Font("Bahnschrift", 0, 18)); // NOI18N
         jTPLexico.setForeground(new java.awt.Color(255, 255, 255));
         jScrollPane2.setViewportView(jTPLexico);
 
@@ -147,13 +147,13 @@ public class IDE extends javax.swing.JFrame
 
         jTPSintactico.setEditable(false);
         jTPSintactico.setBackground(new java.awt.Color(36, 38, 48));
-        jTPSintactico.setFont(new java.awt.Font("Bahnschrift", 0, 14)); // NOI18N
+        jTPSintactico.setFont(new java.awt.Font("Bahnschrift", 0, 18)); // NOI18N
         jTPSintactico.setForeground(new java.awt.Color(255, 255, 255));
         jScrollPane3.setViewportView(jTPSintactico);
 
         jTPCodInt.setEditable(false);
         jTPCodInt.setBackground(new java.awt.Color(36, 38, 48));
-        jTPCodInt.setFont(new java.awt.Font("Bahnschrift", 0, 14)); // NOI18N
+        jTPCodInt.setFont(new java.awt.Font("Bahnschrift", 0, 18)); // NOI18N
         jTPCodInt.setForeground(new java.awt.Color(255, 255, 255));
         jScrollPane4.setViewportView(jTPCodInt);
 
@@ -175,7 +175,7 @@ public class IDE extends javax.swing.JFrame
 
         jTPError.setEditable(false);
         jTPError.setBackground(new java.awt.Color(36, 38, 48));
-        jTPError.setFont(new java.awt.Font("Bahnschrift", 0, 14)); // NOI18N
+        jTPError.setFont(new java.awt.Font("Bahnschrift", 0, 18)); // NOI18N
         jTPError.setForeground(new java.awt.Color(255, 255, 255));
         jScrollPane5.setViewportView(jTPError);
 
@@ -185,19 +185,23 @@ public class IDE extends javax.swing.JFrame
         menuArchivo.setForeground(new java.awt.Color(36, 38, 48));
         menuArchivo.setText("Archivo");
         menuArchivo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        menuArchivo.setFont(new java.awt.Font("Bahnschrift", 0, 14)); // NOI18N
+        menuArchivo.setFont(new java.awt.Font("Bahnschrift", 0, 18)); // NOI18N
         menuArchivo.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
 
+        jMenuItem1.setFont(new java.awt.Font("Bahnschrift", 0, 16)); // NOI18N
         jMenuItem1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/newFileOp.png"))); // NOI18N
         jMenuItem1.setText("Nuevo archivo");
         menuArchivo.add(jMenuItem1);
 
+        jMenuItem2.setFont(new java.awt.Font("Bahnschrift", 0, 16)); // NOI18N
         jMenuItem2.setText("Abrir");
         menuArchivo.add(jMenuItem2);
 
+        jMenuItem3.setFont(new java.awt.Font("Bahnschrift", 0, 16)); // NOI18N
         jMenuItem3.setText("Guardar");
         menuArchivo.add(jMenuItem3);
 
+        jMenuItem4.setFont(new java.awt.Font("Bahnschrift", 0, 16)); // NOI18N
         jMenuItem4.setText("Guardar como...");
         menuArchivo.add(jMenuItem4);
 
@@ -206,8 +210,9 @@ public class IDE extends javax.swing.JFrame
         menuCompilar.setForeground(new java.awt.Color(36, 38, 48));
         menuCompilar.setText("Compilar");
         menuCompilar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        menuCompilar.setFont(new java.awt.Font("Bahnschrift", 0, 14)); // NOI18N
+        menuCompilar.setFont(new java.awt.Font("Bahnschrift", 0, 18)); // NOI18N
 
+        jMenuItem5.setFont(new java.awt.Font("Bahnschrift", 0, 16)); // NOI18N
         jMenuItem5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/runOp.png"))); // NOI18N
         jMenuItem5.setText("Compilar proyecto");
         menuCompilar.add(jMenuItem5);
@@ -235,19 +240,28 @@ public class IDE extends javax.swing.JFrame
                         .addComponent(lblRun, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 810, Short.MAX_VALUE)
                             .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 834, Short.MAX_VALUE)
                             .addComponent(jScrollPane5))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 540, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 540, Short.MAX_VALUE)
-                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 540, Short.MAX_VALUE)
-                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(477, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(14, 14, 14)
+                                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 579, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(13, 13, 13)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 580, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(13, 13, 13)
+                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(13, 13, 13)
+                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 580, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(406, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -278,7 +292,7 @@ public class IDE extends javax.swing.JFrame
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
                     .addComponent(jScrollPane5))
-                .addContainerGap(65, Short.MAX_VALUE))
+                .addContainerGap(60, Short.MAX_VALUE))
         );
 
         pack();
