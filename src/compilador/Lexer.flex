@@ -13,6 +13,9 @@ D=-?[0-9]+|-?(([0-9]+[.]?[0-9]*)|([.][0-9]+))(e[+-]?[0-9]+)?
 CA=\"(\\.|[^\"])*\"
 CAR='([^'\\]|\\\\[btnfr"'\\"\\\\])'
 espacio=[ ]+
+espa=[\t]+
+esp=[\r]+
+salto=[\n]
 %{
     public String lexeme;
     Analisis c=new Analisis();
@@ -21,11 +24,16 @@ espacio=[ ]+
 %}
 %%
 
-"//" .* { /* Ignore */}
-"/*" [^*] ~"*/" | "/*" "*"+ "/" { /* Ignore */ }
+"//" .* { /* Ignore */ }
+"/*" [^*] ~"*/" | "/*" "*"+ "/" { /* Ignore */ }
 {espacio} {/*Ignore*/}
+{espa} {/*Ignore*/}
+{esp} {/*Ignore*/}
+{salto} {/*Ignore*/}
 
 <YYINITIAL> "class" {c.linea = yyline; lexeme = yytext(); return classType;}
+<YYINITIAL> "void" {c.linea = yyline; lexeme = yytext(); return voidType;}
+<YYINITIAL> "main" {c.linea = yyline; lexeme = yytext(); return mainType;}
 <YYINITIAL> "public" {c.linea = yyline; lexeme = yytext(); return publicType;}
 <YYINITIAL> "private" {c.linea = yyline; lexeme = yytext(); return privateType;}
 <YYINITIAL> "int" {estado = 1; c.linea = yyline; lexeme = yytext(); return intType;}

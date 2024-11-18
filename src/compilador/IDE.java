@@ -1,6 +1,15 @@
 package compilador;
 
 import java.awt.Color;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class IDE extends javax.swing.JFrame 
 {
@@ -16,6 +25,56 @@ public class IDE extends javax.swing.JFrame
         
         Iniciar();
     }
+    
+    public void Lexico()
+    {
+        boolean ban = true;
+        int con = 0;
+        Analisis c = new Analisis();
+        File archivo = new File("Compilacion.yum");
+        PrintWriter escribir;
+        try {
+            escribir = new PrintWriter(archivo);
+            escribir.print(jTPCode.getText());
+            escribir.close();
+        }
+        catch(FileNotFoundException e) {
+            Logger.getLogger(IDE.class.getName()).log(Level.SEVERE, null, e);
+        }
+        try {
+            Reader lector  = new BufferedReader(new FileReader("Compilacion.yum"));
+            Lexer lexer = new Lexer(lector);
+            String resLexico = "";            
+            Tokens token = lexer.yylex();
+            
+            while(ban) {
+                if(token == null) {
+                    resLexico += "$";
+                    jTPLexico.setText(resLexico);
+                    ban = false;
+                    return;
+                }
+                switch(token) {
+                    case Error:
+                        jTPError.setText("Error léxico en la línea " + (c.linea + 1) + ": el lexema " + lexer.lexeme + " es irreconocible. \n");
+                        return;
+                    case id, idI, idF, idC, idS, num, litcar, litcad:
+                        resLexico += token + "\n";
+                        break;
+                    default:
+                        resLexico += lexer.lexeme + "\n";
+                        break;
+                }
+                token = lexer.yylex();
+            }
+        }
+        catch(FileNotFoundException ex) {
+            Logger.getLogger(IDE.class.getName()).log(Level.SEVERE, null, ex);            
+        }
+        catch(IOException ex) {
+            Logger.getLogger(IDE.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
 
     @SuppressWarnings("unchecked")
@@ -28,7 +87,7 @@ public class IDE extends javax.swing.JFrame
         lblSaveAs = new javax.swing.JLabel();
         lblRun = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTPCodigo = new javax.swing.JTextPane();
+        jTPCode = new javax.swing.JTextPane();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTPLexico = new javax.swing.JTextPane();
         jScrollPane3 = new javax.swing.JScrollPane();
@@ -43,12 +102,12 @@ public class IDE extends javax.swing.JFrame
         jTPError = new javax.swing.JTextPane();
         menuBar = new javax.swing.JMenuBar();
         menuArchivo = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
-        jMenuItem3 = new javax.swing.JMenuItem();
-        jMenuItem4 = new javax.swing.JMenuItem();
+        mnNew = new javax.swing.JMenuItem();
+        mnOpen = new javax.swing.JMenuItem();
+        mnSave = new javax.swing.JMenuItem();
+        mnSaveAs = new javax.swing.JMenuItem();
         menuCompilar = new javax.swing.JMenu();
-        jMenuItem5 = new javax.swing.JMenuItem();
+        mnRun = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -123,6 +182,9 @@ public class IDE extends javax.swing.JFrame
         lblRun.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         lblRun.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         lblRun.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblRunMouseClicked(evt);
+            }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 lblRunMouseEntered(evt);
             }
@@ -131,10 +193,10 @@ public class IDE extends javax.swing.JFrame
             }
         });
 
-        jTPCodigo.setBackground(new java.awt.Color(36, 38, 48));
-        jTPCodigo.setFont(new java.awt.Font("Bahnschrift", 0, 18)); // NOI18N
-        jTPCodigo.setForeground(new java.awt.Color(255, 255, 255));
-        jScrollPane1.setViewportView(jTPCodigo);
+        jTPCode.setBackground(new java.awt.Color(36, 38, 48));
+        jTPCode.setFont(new java.awt.Font("Bahnschrift", 0, 18)); // NOI18N
+        jTPCode.setForeground(new java.awt.Color(255, 255, 255));
+        jScrollPane1.setViewportView(jTPCode);
 
         jTPLexico.setEditable(false);
         jTPLexico.setBackground(new java.awt.Color(36, 38, 48));
@@ -188,22 +250,42 @@ public class IDE extends javax.swing.JFrame
         menuArchivo.setFont(new java.awt.Font("Bahnschrift", 0, 18)); // NOI18N
         menuArchivo.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
 
-        jMenuItem1.setFont(new java.awt.Font("Bahnschrift", 0, 16)); // NOI18N
-        jMenuItem1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/newFileOp.png"))); // NOI18N
-        jMenuItem1.setText("Nuevo archivo");
-        menuArchivo.add(jMenuItem1);
+        mnNew.setFont(new java.awt.Font("Bahnschrift", 0, 16)); // NOI18N
+        mnNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/newFileOp.png"))); // NOI18N
+        mnNew.setText("Nuevo archivo");
+        mnNew.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnNewActionPerformed(evt);
+            }
+        });
+        menuArchivo.add(mnNew);
 
-        jMenuItem2.setFont(new java.awt.Font("Bahnschrift", 0, 16)); // NOI18N
-        jMenuItem2.setText("Abrir");
-        menuArchivo.add(jMenuItem2);
+        mnOpen.setFont(new java.awt.Font("Bahnschrift", 0, 16)); // NOI18N
+        mnOpen.setText("Abrir");
+        mnOpen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnOpenActionPerformed(evt);
+            }
+        });
+        menuArchivo.add(mnOpen);
 
-        jMenuItem3.setFont(new java.awt.Font("Bahnschrift", 0, 16)); // NOI18N
-        jMenuItem3.setText("Guardar");
-        menuArchivo.add(jMenuItem3);
+        mnSave.setFont(new java.awt.Font("Bahnschrift", 0, 16)); // NOI18N
+        mnSave.setText("Guardar");
+        mnSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnSaveActionPerformed(evt);
+            }
+        });
+        menuArchivo.add(mnSave);
 
-        jMenuItem4.setFont(new java.awt.Font("Bahnschrift", 0, 16)); // NOI18N
-        jMenuItem4.setText("Guardar como...");
-        menuArchivo.add(jMenuItem4);
+        mnSaveAs.setFont(new java.awt.Font("Bahnschrift", 0, 16)); // NOI18N
+        mnSaveAs.setText("Guardar como...");
+        mnSaveAs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnSaveAsActionPerformed(evt);
+            }
+        });
+        menuArchivo.add(mnSaveAs);
 
         menuBar.add(menuArchivo);
 
@@ -212,10 +294,10 @@ public class IDE extends javax.swing.JFrame
         menuCompilar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         menuCompilar.setFont(new java.awt.Font("Bahnschrift", 0, 18)); // NOI18N
 
-        jMenuItem5.setFont(new java.awt.Font("Bahnschrift", 0, 16)); // NOI18N
-        jMenuItem5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/runOp.png"))); // NOI18N
-        jMenuItem5.setText("Compilar proyecto");
-        menuCompilar.add(jMenuItem5);
+        mnRun.setFont(new java.awt.Font("Bahnschrift", 0, 16)); // NOI18N
+        mnRun.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/runOp.png"))); // NOI18N
+        mnRun.setText("Compilar proyecto");
+        menuCompilar.add(mnRun);
 
         menuBar.add(menuCompilar);
 
@@ -368,13 +450,38 @@ public class IDE extends javax.swing.JFrame
         clearAllComp();
     }//GEN-LAST:event_lblSaveAsMouseClicked
 
+    private void mnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnNewActionPerformed
+        direc.Nuevo(this);
+        clearAllComp();
+    }//GEN-LAST:event_mnNewActionPerformed
+
+    private void mnOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnOpenActionPerformed
+        direc.Abrir(this);
+        clearAllComp();
+    }//GEN-LAST:event_mnOpenActionPerformed
+
+    private void mnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnSaveActionPerformed
+        direc.Guardar(this);
+        clearAllComp();
+    }//GEN-LAST:event_mnSaveActionPerformed
+
+    private void mnSaveAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnSaveAsActionPerformed
+        direc.guardarC(this);
+        clearAllComp();
+    }//GEN-LAST:event_mnSaveAsActionPerformed
+
+    private void lblRunMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblRunMouseClicked
+        clearAllComp();
+        Lexico();
+    }//GEN-LAST:event_lblRunMouseClicked
+
     private void Iniciar()
     {
         direc = new Directorio();
         setTitle("#YURIDE");
         String[] options = new String[] {"Guardar y continuar", "Descartar"};
         
-        numeroLinea = new Linea(jTPCodigo);
+        numeroLinea = new Linea(jTPCode);
         jScrollPane1.setRowHeaderView(numeroLinea);
     }
     
@@ -426,18 +533,13 @@ public class IDE extends javax.swing.JFrame
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem3;
-    private javax.swing.JMenuItem jMenuItem4;
-    private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JTextPane jTPCodInt;
-    public javax.swing.JTextPane jTPCodigo;
+    public javax.swing.JTextPane jTPCode;
     private javax.swing.JTextPane jTPError;
     private javax.swing.JTextPane jTPLexico;
     private javax.swing.JTextPane jTPSintactico;
@@ -449,5 +551,10 @@ public class IDE extends javax.swing.JFrame
     private javax.swing.JMenu menuArchivo;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenu menuCompilar;
+    private javax.swing.JMenuItem mnNew;
+    private javax.swing.JMenuItem mnOpen;
+    private javax.swing.JMenuItem mnRun;
+    private javax.swing.JMenuItem mnSave;
+    private javax.swing.JMenuItem mnSaveAs;
     // End of variables declaration//GEN-END:variables
 }

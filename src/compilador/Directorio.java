@@ -78,7 +78,7 @@ public class Directorio
             // Si el usuario elige guardar los cambios y ha seleccionado un archivo en el objeto JFileChooser,
             // entonces guarda el archivo en el objeto File especificado utilizando el método saveFile.
             if(selecFileG.getSelectedFile() != null) {
-                boolean save = saveFile(fileG, compF.jTPCodigo.getText());
+                boolean save = saveFile(fileG, compF.jTPCode.getText());
                 if(save)
                     compF.setTitle(fileG.getName());                    
             }
@@ -141,7 +141,7 @@ public class Directorio
                                             "¿Descartar edición?", -1, 3, null, options, options[0]);
         if(x == 0) {
             if(selecFileG.getSelectedFile() != null) {
-                boolean save = saveFile(fileG, compF.jTPCodigo.getText());
+                boolean save = saveFile(fileG, compF.jTPCode.getText());
                 if(save)
                     compF.setTitle(fileG.getName());                    
             } else 
@@ -177,7 +177,7 @@ public class Directorio
                             }
                         }                    
                     } else {
-                        compF.jTPCodigo.setText("");
+                        compF.jTPCode.setText("");
                         compF.setTitle("[#YURIDE]");
                     }
                 } else {
@@ -187,7 +187,7 @@ public class Directorio
                         guardarArch(fileG, compF); 
                 }               
         } else {
-            compF.jTPCodigo.setText("");
+            compF.jTPCode.setText("");
             compF.setTitle("[#YURIDE]");
         }
         return true;
@@ -195,7 +195,7 @@ public class Directorio
     
     public void guardarArch(File file, IDE compF)
     {
-        boolean save = saveFile(file, compF.jTPCodigo.getText());
+        boolean save = saveFile(file, compF.jTPCode.getText());
         // Esta línea llama al método saveFile para guardar el contenido del archivo en compF.jTPCodigo.getText(). 
         // El resultado se guarda en una variable booleana llamada save.
         if(save)
@@ -215,7 +215,7 @@ public class Directorio
                 // Si el archivo actual se ha editado y no se ha guardado, se llama al método "guardarEditNuevo" que intenta guardarlo y 
                 // devuelve un valor booleano que indica si la operación fue exitosa o no.
                 compF.setTitle("[#YURIDE]");
-                compF.jTPCodigo.setText("");
+                compF.jTPCode.setText("");
                 // Esta línea crea un nuevo objeto "JFileChooser" para permitir al usuario seleccionar un nuevo archivo.
                 selecFile = new JFileChooser();
                 // Esta línea establece la variable "file" en "null" para indicar que no hay ningún archivo abierto actualmente en la aplicación.
@@ -223,7 +223,7 @@ public class Directorio
             }
         } else {
             compF.setTitle("[#YURIDE]");
-            compF.jTPCodigo.setText("");
+            compF.jTPCode.setText("");
             selecFile = new JFileChooser();
             file = null;
         }
@@ -254,7 +254,7 @@ public class Directorio
                     else {
                         String t = getTextFile(tFile);                          
                         if(t != null) {
-                            compF.jTPCodigo.setText(t);
+                            compF.jTPCode.setText(t);
                             compF.setTitle(tFile.getName());
                             compF.clearAllComp();
                             selecFile = tSelecFile;
@@ -300,7 +300,7 @@ public class Directorio
                 else {
                     String t = getTextFile(tFile);                           
                     if(t != null) {
-                        compF.jTPCodigo.setText(t);
+                        compF.jTPCode.setText(t);
                         compF.setTitle(tFile.getName());
                         compF.clearAllComp();
                         selecFile = tSelecFile;

@@ -3,6 +3,8 @@ package compilador;
 public enum Tokens 
 {
     classType,
+    voidType,
+    mainType,
     publicType,
     privateType,
     id,
