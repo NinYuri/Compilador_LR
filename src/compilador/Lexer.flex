@@ -31,8 +31,8 @@ salto=[\n]
 {esp} {/*Ignore*/}
 {salto} {/*Ignore*/}
 
-<YYINITIAL> "class" {c.linea = yyline; lexeme = yytext(); return classType;}
-<YYINITIAL> "void" {c.linea = yyline; lexeme = yytext(); return voidType;}
+<YYINITIAL> "class" {estado = 5; c.linea = yyline; lexeme = yytext(); return classType;}
+<YYINITIAL> "void" {estado = 6; c.linea = yyline; lexeme = yytext(); return voidType;}
 <YYINITIAL> "main" {c.linea = yyline; lexeme = yytext(); return mainType;}
 <YYINITIAL> "public" {c.linea = yyline; lexeme = yytext(); return publicType;}
 <YYINITIAL> "private" {c.linea = yyline; lexeme = yytext(); return privateType;}
@@ -41,7 +41,7 @@ salto=[\n]
 <YYINITIAL> "char" {estado = 3; c.linea = yyline; lexeme = yytext(); return charType;}
 <YYINITIAL> "String" {estado = 4; c.linea= yyline; lexeme = yytext(); return stringType;}
 <YYINITIAL> "," {c.linea= yyline; lexeme = yytext(); return coma;}
-<YYINITIAL> ";" {c.linea= yyline; estado = 0; lexeme = yytext(); return semicolon;}
+<YYINITIAL> ";" {estado = 0; c.linea= yyline; lexeme = yytext(); return semicolon;}
 <YYINITIAL> "+" {c.linea= yyline; lexeme = yytext(); return plus;}
 <YYINITIAL> "-" {c.linea= yyline; lexeme = yytext(); return minus;}
 <YYINITIAL> "*" {c.linea= yyline; lexeme = yytext(); return mult;}
@@ -55,7 +55,7 @@ salto=[\n]
 <YYINITIAL> "==" {c.linea = yyline; lexeme = yytext(); return equals_to;}
 <YYINITIAL> "(" {c.linea = yyline; lexeme = yytext(); return open_parenth;}
 <YYINITIAL> ")" {c.linea = yyline; lexeme = yytext(); return close_parenth;}
-<YYINITIAL> "{" {c.linea = yyline; lexeme = yytext(); return open_key;}
+<YYINITIAL> "{" {estado = 0; c.linea = yyline; lexeme = yytext(); return open_key;}
 <YYINITIAL> "}" {c.linea = yyline; lexeme = yytext(); return close_key;}
 <YYINITIAL> "if" {c.linea = yyline; lexeme = yytext(); return if_keyword;}
 <YYINITIAL> "while" {c.linea = yyline; lexeme = yytext(); return while_keyword;}
@@ -77,6 +77,14 @@ salto=[\n]
         c.linea = yyline;
         lexeme = yytext();
         return idS;
+    } else if(estado == 5) {
+        c.linea = yyline;
+        lexeme = yytext();
+        return idClass;
+    } else if(estado == 6) {
+        c.linea = yyline;
+        lexeme = yytext();
+        return idMet;
     } else {
         lexeme = yytext();
         return id;

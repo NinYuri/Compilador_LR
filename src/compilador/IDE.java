@@ -8,6 +8,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,6 +17,15 @@ public class IDE extends javax.swing.JFrame
 {
     Linea numeroLinea;
     Directorio direc;
+    List<String[]> tablaSim = new ArrayList<>();
+    String error = "";
+    
+    boolean [][] reglaAsig = {
+        {true, false, false, false},
+        {true, true, false, false},
+        {false, false, true, false},
+        {false, false, false, true}
+    };
     
     public IDE() 
     {
@@ -28,8 +39,8 @@ public class IDE extends javax.swing.JFrame
     
     public void Lexico()
     {
+        //Sintactico obs = new Sintactico();
         boolean ban = true;
-        int con = 0;
         Analisis c = new Analisis();
         File archivo = new File("Compilacion.yum");
         PrintWriter escribir;
@@ -46,24 +57,58 @@ public class IDE extends javax.swing.JFrame
             Lexer lexer = new Lexer(lector);
             String resLexico = "";            
             Tokens token = lexer.yylex();
+            //obs.lexemaOriginal = "" + lexer.lexeme;
             
             while(ban) {
-                if(token == null) {
+                if(token == null) { //|| !obs.error.equals("")) {
+                    //if (obs.error.equals("")) {
+                    //    obs.BuscarElemento("$", c.linea + 1);
+                    //}
+                    //jTPError.setText(obs.error);
                     resLexico += "$";
                     jTPLexico.setText(resLexico);
                     ban = false;
+                    //jTPSintactico.setText(obs.resultado);
                     return;
                 }
                 switch(token) {
                     case Error:
-                        jTPError.setText("Error léxico en la línea " + (c.linea + 1) + ": el lexema " + lexer.lexeme + " es irreconocible. \n");
+                        jTPError.setText("Error léxico en la línea " + (c.linea + 1) + ": El lexema " + lexer.lexeme + " es irreconocible. \n");
+                        //obs.error+="Error léxico en la línea " + (c.linea + 1) + ": el lexema " + lexer.lexeme + " es irreconocible. \n";
+                        //obs.BuscarElemento("$", c.linea + 1);
+                        //jTPSintactico.setText(obs.resultado);
+                        //jTPError.setText(obs.error);
+                        
+                        //if (lexer.lexeme.equals("" + '"')) {
+
+                            //ban = false;
+                            //obs.BuscarElemento("$", c.linea + 1);
+                            resLexico += "$";
+                            jTPLexico.setText(resLexico);
+                            //jTPSintactico.setText(obs.resultado);
+                            //jTPError.setText(obs.error);
+                        //}                        
                         return;
-                    case id, idI, idF, idC, idS, num, litcar, litcad:
+                    case id, idI, idF, idC, idS, idClass, idMet, num, litcar, litcad:
+                        if(token == Tokens.idI || token == Tokens.idF || token == Tokens.idC || token == Tokens.idS) {
+                            Tabla(String.valueOf(token), String.valueOf(lexer.lexeme), c.linea);
+                            token = Tokens.id;
+                        } else {
+                            if(token == Tokens.id){}
+                        }
                         resLexico += token + "\n";
+                        //obs.BuscarElemento("" + token, c.linea + 1);
                         break;
                     default:
                         resLexico += lexer.lexeme + "\n";
+                        //obs.BuscarElemento("" + lexer.lexeme, c.linea + 1);
                         break;
+                }
+                if(!error.equals("")) {
+                    resLexico += "$";
+                    jTPLexico.setText(resLexico);
+                    jTPError.setText(error);
+                    return;
                 }
                 token = lexer.yylex();
             }
@@ -74,6 +119,58 @@ public class IDE extends javax.swing.JFrame
         catch(IOException ex) {
             Logger.getLogger(IDE.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    private void Tabla(String token, String lexema, int linea)
+    {
+        if(!tablaSim.isEmpty()) {
+            if(!Buscar(lexema, linea))
+                Tipo(token, lexema);
+        } else
+            Tipo(token, lexema);
+    }
+    
+    private boolean Buscar(String lexema, int linea)
+    {
+        for(String[] vars: tablaSim)
+            if(vars[0].equals(lexema)) {
+                error += "Error semántico en la línea " + (linea + 1) + ": La variable " + lexema + " ya se encuentra definida como " + tipoStr(vars[1] + ".");
+                return true;
+            }
+        return false;
+    }
+    
+    private void Tipo(String token, String lexema)
+    {
+        switch(token) {
+            case "idI":
+                tablaSim.add(new String[]{lexema, "0"});
+                break;
+            case "idF":
+                tablaSim.add(new String[]{lexema, "1"});
+                break;
+            case "idC":
+                tablaSim.add(new String[]{lexema, "2"});
+                break;
+            case "idS":
+                tablaSim.add(new String[]{lexema, "3"});
+                break;
+        }
+    }
+    
+    private String tipoStr(String tipo)
+    {
+        switch(tipo) {
+            case "0":
+                return "int";
+            case "1":
+                return "float";
+            case "2":
+                return "char";
+            case "3":
+                return "String";
+        }
+        return "";
     }
 
 
@@ -297,6 +394,11 @@ public class IDE extends javax.swing.JFrame
         mnRun.setFont(new java.awt.Font("Bahnschrift", 0, 16)); // NOI18N
         mnRun.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/runOp.png"))); // NOI18N
         mnRun.setText("Compilar proyecto");
+        mnRun.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnRunActionPerformed(evt);
+            }
+        });
         menuCompilar.add(mnRun);
 
         menuBar.add(menuCompilar);
@@ -433,47 +535,62 @@ public class IDE extends javax.swing.JFrame
     private void lblNewMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblNewMouseClicked
         direc.Nuevo(this);
         clearAllComp();
+        clearVar();
     }//GEN-LAST:event_lblNewMouseClicked
 
     private void lblOpenMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblOpenMouseClicked
         direc.Abrir(this);
         clearAllComp();
+        clearVar();
     }//GEN-LAST:event_lblOpenMouseClicked
 
     private void lblSaveMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblSaveMouseClicked
         direc.Guardar(this);
         clearAllComp();
+        clearVar();
     }//GEN-LAST:event_lblSaveMouseClicked
 
     private void lblSaveAsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblSaveAsMouseClicked
         direc.guardarC(this);
         clearAllComp();
+        clearVar();
     }//GEN-LAST:event_lblSaveAsMouseClicked
 
     private void mnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnNewActionPerformed
         direc.Nuevo(this);
         clearAllComp();
+        clearVar();
     }//GEN-LAST:event_mnNewActionPerformed
 
     private void mnOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnOpenActionPerformed
         direc.Abrir(this);
         clearAllComp();
+        clearVar();
     }//GEN-LAST:event_mnOpenActionPerformed
 
     private void mnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnSaveActionPerformed
         direc.Guardar(this);
         clearAllComp();
+        clearVar();
     }//GEN-LAST:event_mnSaveActionPerformed
 
     private void mnSaveAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnSaveAsActionPerformed
         direc.guardarC(this);
         clearAllComp();
+        clearVar();
     }//GEN-LAST:event_mnSaveAsActionPerformed
 
     private void lblRunMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblRunMouseClicked
         clearAllComp();
+        clearVar();
         Lexico();
     }//GEN-LAST:event_lblRunMouseClicked
+
+    private void mnRunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnRunActionPerformed
+        clearAllComp();
+        clearVar();
+        Lexico();
+    }//GEN-LAST:event_mnRunActionPerformed
 
     private void Iniciar()
     {
@@ -491,6 +608,12 @@ public class IDE extends javax.swing.JFrame
         jTPSintactico.setText("");
         jTPCodInt.setText("");
         jTPError.setText("");
+    }
+    
+    private void clearVar()
+    {
+        tablaSim = new ArrayList<>();
+        error = "";
     }
     
     /**

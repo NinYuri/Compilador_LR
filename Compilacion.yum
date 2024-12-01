@@ -1,15 +1,3 @@
-public class Ejemplo 
-{
-     int b, i = 0;
-     float c;
-     char t = 'y';
-     String cad = "";
-
-     public Hola() {
-         int con = 0;
-         if(con != 6) {
-            cad = "menor";
-         }
-	
-     }
+public class Ejemplo {
+	int num;
 }

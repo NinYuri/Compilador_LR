@@ -12,6 +12,8 @@ public enum Tokens
     idF,
     idC,
     idS,
+    idClass,
+    idMet,
     num,
     litcar,
     litcad,

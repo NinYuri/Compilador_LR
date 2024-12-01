@@ -100,6 +100,9 @@
                 </Property>
                 <Property name="text" type="java.lang.String" value="Compilar proyecto"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnRunActionPerformed"/>
+              </Events>
             </MenuItem>
           </SubComponents>
         </Menu>
