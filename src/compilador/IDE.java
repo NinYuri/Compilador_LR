@@ -90,11 +90,15 @@ public class IDE extends javax.swing.JFrame
                         //}                        
                         return;
                     case id, idI, idF, idC, idS, idClass, idMet, num, litcar, litcad:
-                        if(token == Tokens.idI || token == Tokens.idF || token == Tokens.idC || token == Tokens.idS) {
+                        if(token == Tokens.idI || token == Tokens.idF || token == Tokens.idC || token == Tokens.idS || token == Tokens.idMet) {
                             Tabla(String.valueOf(token), String.valueOf(lexer.lexeme), c.linea);
                             token = Tokens.id;
-                        } else {
-                            if(token == Tokens.id){}
+                        } else if(token == Tokens.id) {
+                            if(!buscarID(lexer.lexeme)) {
+                                //corregir linea
+                                error += "Error semántico en la línea " + (c.linea + 1) + ": La variable " + lexer.lexeme + " no se encuentra definida.";
+                                break;
+                            }
                         }
                         resLexico += token + "\n";
                         //obs.BuscarElemento("" + token, c.linea + 1);
@@ -134,7 +138,19 @@ public class IDE extends javax.swing.JFrame
     {
         for(String[] vars: tablaSim)
             if(vars[0].equals(lexema)) {
-                error += "Error semántico en la línea " + (linea + 1) + ": La variable " + lexema + " ya se encuentra definida como " + tipoStr(vars[1] + ".");
+                if(vars[1].equals("m"))
+                    error += "Error semántico en la línea " + (linea + 1) + ": El método " + lexema + " ya se encuentra declarado.";
+                else
+                    error += "Error semántico en la línea " + (linea + 1) + ": La variable " + lexema + " ya se encuentra definida como " + tipoStr(vars[1]) + ".";
+                return true;                                   
+            }
+        return false;
+    }
+    
+    public boolean buscarID(String lexema)
+    {
+        for(String[] vars: tablaSim)
+            if(vars[0].equals(lexema)) {
                 return true;
             }
         return false;
@@ -154,6 +170,9 @@ public class IDE extends javax.swing.JFrame
                 break;
             case "idS":
                 tablaSim.add(new String[]{lexema, "3"});
+                break;
+            case "idMet":
+                tablaSim.add(new String[]{lexema, "m"});
                 break;
         }
     }
