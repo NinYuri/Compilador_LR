@@ -1,3 +1,5 @@
-public void Ejemplo() {
-	con = 00;
+public class Ejemplo 
+{
+	void () {
+	}
 }

@@ -10,11 +10,13 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class IDE extends javax.swing.JFrame 
 {
+    Sintactico sint = new Sintactico();
     Linea numeroLinea;
     Directorio direc;
     List<String[]> tablaSim = new ArrayList<>();
@@ -38,8 +40,7 @@ public class IDE extends javax.swing.JFrame
     }
     
     public void Lexico()
-    {
-        //Sintactico obs = new Sintactico();
+    {        
         boolean ban = true;
         Analisis c = new Analisis();
         File archivo = new File("Compilacion.yum");
@@ -55,39 +56,43 @@ public class IDE extends javax.swing.JFrame
         try {
             Reader lector  = new BufferedReader(new FileReader("Compilacion.yum"));
             Lexer lexer = new Lexer(lector);
-            String resLexico = "";            
+            String resLexico = "";
+            Stack<String> pilaSint = new Stack();
+            StringBuilder texto = new StringBuilder();
+            String acum = "";
             Tokens token = lexer.yylex();
-            //obs.lexemaOriginal = "" + lexer.lexeme;
             
             while(ban) {
-                if(token == null) { //|| !obs.error.equals("")) {
-                    //if (obs.error.equals("")) {
-                    //    obs.BuscarElemento("$", c.linea + 1);
-                    //}
-                    //jTPError.setText(obs.error);
+                if(token == null) {
                     resLexico += "$";
-                    jTPLexico.setText(resLexico);
+                    sint.Sintactico("$");
+                    jTPLexico.setText(resLexico); 
+                    
+                    pilaSint = sint.Pila();                 
+                    for(String reng : pilaSint)
+                        texto.append(reng).append("\n");
+                    texto.append("$I0CLASS'");
+                    jTPSintactico.setText(texto.toString());
+                    
                     ban = false;
-                    //jTPSintactico.setText(obs.resultado);
+                    System.out.println("TABLA DE SIMBOLOS");
+        for(String[] fila : tablaSim) {
+            for(String dato : fila)
+                System.out.print(dato + "\t");            
+            System.out.println();
+        }
+        System.out.println();
                     return;
                 }
                 switch(token) {
                     case Error:
-                        jTPError.setText("Error léxico en la línea " + (c.linea + 1) + ": El lexema " + lexer.lexeme + " es irreconocible. \n");
-                        //obs.error+="Error léxico en la línea " + (c.linea + 1) + ": el lexema " + lexer.lexeme + " es irreconocible. \n";
-                        //obs.BuscarElemento("$", c.linea + 1);
-                        //jTPSintactico.setText(obs.resultado);
-                        //jTPError.setText(obs.error);
-                        
-                        //if (lexer.lexeme.equals("" + '"')) {
-
-                            //ban = false;
-                            //obs.BuscarElemento("$", c.linea + 1);
-                            resLexico += "$";
-                            jTPLexico.setText(resLexico);
-                            //jTPSintactico.setText(obs.resultado);
-                            //jTPError.setText(obs.error);
-                        //}                        
+                        jTPError.setText("Error léxico en la línea " + (c.linea + 1) + ": El lexema " + lexer.lexeme + " es irreconocible. \n");                        
+                        resLexico += "$";
+                        jTPLexico.setText(resLexico);
+                        pilaSint = sint.Pila();                 
+                        for(String reng : pilaSint)
+                            texto.append(reng).append("\n");
+                        jTPSintactico.setText(texto.toString());
                         return;
                     case id, idI, idF, idC, idS, idClass, idMet, num, litcar, litcad:
                         if(token == Tokens.idI || token == Tokens.idF || token == Tokens.idC || token == Tokens.idS || token == Tokens.idMet) {
@@ -99,19 +104,34 @@ public class IDE extends javax.swing.JFrame
                                 error += "Error semántico en la línea " + (c.linea + 1) + ": La variable " + lexer.lexeme + " no se encuentra definida.";
                                 break;
                             }
-                        }
+                        } else if(token == Tokens.idClass)
+                            token = Tokens.id;
                         resLexico += token + "\n";
-                        //obs.BuscarElemento("" + token, c.linea + 1);
+                        sint.Sintactico(String.valueOf(token));
                         break;
                     default:
                         resLexico += lexer.lexeme + "\n";
-                        //obs.BuscarElemento("" + lexer.lexeme, c.linea + 1);
+                        sint.Sintactico(String.valueOf(lexer.lexeme));
                         break;
                 }
                 if(!error.equals("")) {
                     resLexico += "$";
                     jTPLexico.setText(resLexico);
+                    pilaSint = sint.Pila();                 
+                    for(String reng : pilaSint)
+                        texto.append(reng).append("\n");
+                    jTPSintactico.setText(texto.toString());
                     jTPError.setText(error);
+                    return;
+                }
+                if(sint.Error()) {
+                    resLexico += "$";
+                    jTPLexico.setText(resLexico);
+                    pilaSint = sint.Pila();                 
+                    for(String reng : pilaSint)
+                        texto.append(reng).append("\n");
+                    jTPSintactico.setText(texto.toString());
+                    jTPError.setText("Error sintáctico en la línea " + (c.linea + 1) + ": Se recibició un " + lexer.lexeme + " cuando se esperaba un " + sint.Esperado() + ".");
                     return;
                 }
                 token = lexer.yylex();
@@ -633,6 +653,7 @@ public class IDE extends javax.swing.JFrame
     {
         tablaSim = new ArrayList<>();
         error = "";
+        sint.Reinicio();
     }
     
     /**
