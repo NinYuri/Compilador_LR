@@ -98,7 +98,7 @@ public class IDE extends javax.swing.JFrame
                                 token = Tokens.id;
                             } else if(token == Tokens.id) {
                                 if(!buscarID(lexer.lexeme)) {
-                                    error += "Error semántico en la línea " + (c.linea + 1) + ": La variable " + lexer.lexeme + " no se encuentra definida.";
+                                    error += "Error semántico en la línea " + (c.linea + 1) + ": La variable o método " + lexer.lexeme + " no se encuentra definido.";
                                     break;
                                 }
                             }

@@ -8,7 +8,9 @@ import java.util.Stack;
 public class Sintactico 
 {
     String var = "";
-    String dato = "";    
+    String datoVar = ""; 
+    String variable = "";
+    int varAsig = -1;
     boolean errSint = false;
     String error = "";
     int t1, t2;
@@ -210,7 +212,7 @@ public class Sintactico
                 if(prod[0].equals("VAR")) {
                     switch(simb[0]) {
                         case "id":
-                            pilaSem.push(buscarTipo(this.dato));
+                            pilaSem.push(buscarTipo(datoVar));
                             break;
                         default:
                             pilaSem.push(Tipo());
@@ -230,7 +232,7 @@ public class Sintactico
                 if(prod[0].equals("F")) {
                     switch(simb[0]) {
                         case "id":
-                            pilaSem.push(buscarTipo(this.dato));
+                            pilaSem.push(buscarTipo(datoVar));
                             break;
                         case "num", "litcar", "litcad":
                             pilaSem.push(Tipo());
@@ -248,7 +250,7 @@ public class Sintactico
                         } else
                             pilaSem.push(exp[t1][t2]);
                     }
-                }             
+                }
                 
                 ren = Integer.parseInt(pila.peek().substring(1));
                 col = buscarColumna(token);
@@ -268,16 +270,26 @@ public class Sintactico
                         error = "La variable " + pilaID.peek() + " de tipo " + buscarID(t1) + " no puede recibir un " + buscarID(t2) + ".";
                         return;
                     }
-                }                    
+                }
+                if((pila.peek().equals("I46") || pila.peek().equals("I56") || pila.peek().equals("I121")) && token.equals("id")) {                   
+                    varAsig = buscarTipo(datoVar);
+                    variable = datoVar;
+                }
+                if(pila.peek().equals("I66") && token.equals(";")) {
+                    if(!pilaSem.isEmpty()) {
+                        if(!reglaAsig[varAsig][pilaSem.peek()]) {
+                            error = "La variable " + variable + " de tipo " + buscarID(varAsig) + " no puede recibir un " + buscarID(pilaSem.peek()) + ".";
+                            pilaSem.pop();
+                            return;
+                        } else {
+                            pilaSem.pop();
+                        }
+                    }
+                }                
                 
                 pila.push(token);
                 pila.push(dato);
                 pilaAux();
-                
-                System.out.println("PILA SEMANTICA");
-        for(Integer numero : pilaSem)
-            System.out.println(numero);
-        System.out.println();
             }
         } else {
             errSint = true;
@@ -307,7 +319,9 @@ public class Sintactico
     public void Reinicio()
     {
         var = "";
-        dato = "";
+        datoVar = "";
+        varAsig = -1;
+        variable = "";
         error = "";
         t1 = -1;
         t2 = -1;
@@ -345,7 +359,7 @@ public class Sintactico
         
         switch(var) {           
             case "num":
-                if(dato.matches(entero))
+                if(datoVar.matches(entero))
                     return 0;
                 else
                     return 1;
@@ -361,7 +375,10 @@ public class Sintactico
     {
         for(String[] vars: tablaSim)
             if(vars[0].equals(lexema)) {
-                return Integer.parseInt(vars[1]);
+                if(!vars[1].equals("m"))
+                    return Integer.parseInt(vars[1]);
+                else
+                    return 4;
             }
         return -1;
     }
@@ -399,7 +416,7 @@ public class Sintactico
     public void Variable(String token, String lexema)
     {
         var = token;
-        dato = lexema;
+        datoVar = lexema;
     }
     
     public void Tabla(List<String[]> tablaSim)

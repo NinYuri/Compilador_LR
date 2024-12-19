@@ -1,10 +1,21 @@
-public class Ejemplo 
-{
-    String cad;
-    int con = 0;
-    float b, c;
-     
-     void main() {
-	con = 90 - b * (b / c);
-     }
+public class Ejemplo {
+
+    int valorInicial = 20;
+    String progreso = "";
+
+    public void Analizar() {
+        int dato;
+        if (dato >= 15) {
+            print("Dato válido");
+            while (dato != 5) {
+                print("Analizando..." + dato);
+                progreso = "En curso";
+                dato = read();
+            }
+        }
+    }
+
+    void main() {
+        Analizar();
+    }
 }
