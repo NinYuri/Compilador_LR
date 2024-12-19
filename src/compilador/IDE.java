@@ -21,13 +21,7 @@ public class IDE extends javax.swing.JFrame
     Directorio direc;
     List<String[]> tablaSim = new ArrayList<>();
     String error = "";
-    
-    boolean [][] reglaAsig = {
-        {true, false, false, false},
-        {true, true, false, false},
-        {false, false, true, false},
-        {false, false, false, true}
-    };
+    int llaves = 0;            
     
     public IDE() 
     {
@@ -59,14 +53,13 @@ public class IDE extends javax.swing.JFrame
             String resLexico = "";
             Stack<String> pilaSint = new Stack();
             StringBuilder texto = new StringBuilder();
-            String acum = "";
             Tokens token = lexer.yylex();
             
             while(ban) {
                 if(token == null) {
                     resLexico += "$";
                     sint.Sintactico("$");
-                    jTPLexico.setText(resLexico); 
+                    jTPLexico.setText(resLexico);
                     
                     pilaSint = sint.Pila();                 
                     for(String reng : pilaSint)
@@ -95,19 +88,40 @@ public class IDE extends javax.swing.JFrame
                         jTPSintactico.setText(texto.toString());
                         return;
                     case id, idI, idF, idC, idS, idClass, idMet, num, litcar, litcad:
-                        if(token == Tokens.idI || token == Tokens.idF || token == Tokens.idC || token == Tokens.idS || token == Tokens.idMet) {
-                            Tabla(String.valueOf(token), String.valueOf(lexer.lexeme), c.linea);
+                        if(token == Tokens.idClass)
                             token = Tokens.id;
-                        } else if(token == Tokens.id) {
-                            if(!buscarID(lexer.lexeme)) {
-                                //corregir linea
-                                error += "Error semántico en la línea " + (c.linea + 1) + ": La variable " + lexer.lexeme + " no se encuentra definida.";
-                                break;
+                        else
+                            if(token == Tokens.idI || token == Tokens.idF || token == Tokens.idC || token == Tokens.idS || token == Tokens.idMet) {
+                                Tabla(String.valueOf(token), String.valueOf(lexer.lexeme), c.linea);
+                                sint.Tabla(tablaSim);
+                                sint.ID(lexer.lexeme);
+                                token = Tokens.id;
+                            } else if(token == Tokens.id) {
+                                if(!buscarID(lexer.lexeme)) {
+                                    error += "Error semántico en la línea " + (c.linea + 1) + ": La variable " + lexer.lexeme + " no se encuentra definida.";
+                                    break;
+                                }
                             }
-                        } else if(token == Tokens.idClass)
-                            token = Tokens.id;
-                        resLexico += token + "\n";
+                        
+                        if(token == Tokens.id || token == Tokens.num || token == Tokens.litcad || token == Tokens.litcar)
+                            sint.Variable(String.valueOf(token), String.valueOf(lexer.lexeme));
+
+                        resLexico += token + "\n";                        
                         sint.Sintactico(String.valueOf(token));
+                        break;
+                    case open_key:
+                        llaves++;
+                        resLexico += lexer.lexeme + "\n";
+                        sint.Sintactico(String.valueOf(lexer.lexeme));
+                        break;
+                    case close_key:
+                        if(llaves != 0) {
+                            llaves--;
+                            resLexico += lexer.lexeme + "\n";
+                            sint.Sintactico(String.valueOf(lexer.lexeme));
+                        }                          
+                        else
+                            error += "Error sintáctico en la línea " + (c.linea + 1) + ": Existe una llave } innecesaria.";                                       
                         break;
                     default:
                         resLexico += lexer.lexeme + "\n";
@@ -124,7 +138,7 @@ public class IDE extends javax.swing.JFrame
                     jTPError.setText(error);
                     return;
                 }
-                if(sint.Error()) {
+                if(sint.errSint) {
                     resLexico += "$";
                     jTPLexico.setText(resLexico);
                     pilaSint = sint.Pila();                 
@@ -132,6 +146,16 @@ public class IDE extends javax.swing.JFrame
                         texto.append(reng).append("\n");
                     jTPSintactico.setText(texto.toString());
                     jTPError.setText("Error sintáctico en la línea " + (c.linea + 1) + ": Se recibició un " + lexer.lexeme + " cuando se esperaba un " + sint.Esperado() + ".");
+                    return;
+                }
+                if(!sint.error.equals("")) {
+                    resLexico += "$";
+                    jTPLexico.setText(resLexico);
+                    pilaSint = sint.Pila();                 
+                    for(String reng : pilaSint)
+                        texto.append(reng).append("\n");
+                    jTPSintactico.setText(texto.toString());
+                    jTPError.setText("Error semántico en la línea " + (c.linea + 1) + ": " + sint.error);
                     return;
                 }
                 token = lexer.yylex();
@@ -211,8 +235,7 @@ public class IDE extends javax.swing.JFrame
         }
         return "";
     }
-
-
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -653,6 +676,7 @@ public class IDE extends javax.swing.JFrame
     {
         tablaSim = new ArrayList<>();
         error = "";
+        llaves = 0;
         sint.Reinicio();
     }
     

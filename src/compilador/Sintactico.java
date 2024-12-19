@@ -1,16 +1,45 @@
 package compilador;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Stack;
 
 public class Sintactico 
 {
+    String var = "";
+    String dato = "";    
     boolean errSint = false;
-    String error;
+    String error = "";
+    int t1, t2;
     Stack<String> pila = new Stack();
     Stack<String> pilaAux = new Stack();
+    Stack<String> temp = new Stack();
+    Stack<Integer> pilaSem = new Stack<>();
+    Stack<String> pilaID = new Stack<>();
+    List<String[]> tablaSim = new ArrayList<>();
+    
+    boolean [][] reglaAsig = {
+        {true, false, false, false},
+        {true, true, false, false},
+        {false, false, true, false},
+        {false, false, false, true}
+    };
+    int [][] exp = {
+        {0, 1, -1, -1},
+        {1, 1, -1, -1},
+        {-1, -1, -1, -1},
+        {-1, -1, -1, -1}
+    };
+    boolean [][] comp = {
+        {true, true, false, false},
+        {true, true, false, false},
+        {false, false, true, false},
+        {false, false, false, true}
+    };
+    
     String not[] = {"$", "CLASS", "BODY", "DEC", "TIPO", "V", "N", "DATO", "MET", "METHOD", "TIPO_MET", "BODY_MET", "STMNT", "AC", "ASIG", "V_ASIG", "CIC", "R", "OP_REL", "E", "T", "F", "MAIN", "VAR", "MENS", "MORE_M", "SIMB"};
-    String columnas[] = {"id", "num", "litcar", "litcad", "int", "float", "char", "String", ",", ";", " + ", " -", " *", " /", " =", " <", " >", " <=", " >=", " !=", " ==", "(", ")", "{", "}", "if", "while", "read", "print", "class", "void", "main", "public", "private", "$", "CLASS", "BODY", "DEC", "TIPO", "V", "N", "DATO", "MET", "METHOD", "TIPO_MET", "BODY_MET", "STMNT", "AC", "ASIG", "V_ASIG", "CIC", "R", "OP_REL", "E", "T", "F", "MAIN", "VAR", "MENS", "MORE_M", "SIMB"};
+    String columnas[] = {"id", "num", "litcar", "litcad", "int", "float", "char", "String", ",", ";", "+", "-", "*", "/", "=", "<", ">", "<=", ">=", "!=", "==", "(", ")", "{", "}", "if", "while", "read", "print", "class", "void", "main", "public", "private", "$", "CLASS", "BODY", "DEC", "TIPO", "V", "N", "DATO", "MET", "METHOD", "TIPO_MET", "BODY_MET", "STMNT", "AC", "ASIG", "V_ASIG", "CIC", "R", "OP_REL", "E", "T", "F", "MAIN", "VAR", "MENS", "MORE_M", "SIMB"};
     String producciones[] = {   "CLASS'#CLASS", "CLASS#public class id { BODY }", "BODY#DEC MET MAIN", "DEC#TIPO id N", "DEC#vacia", "TIPO#int", "TIPO#float", "TIPO#char", "TIPO#String", "V#, id N", "V#; DEC",	
                                 "N#V", "N#= DATO V", "DATO#num", "DATO#litcar", "DATO#litcad", "MET#METHOD MET", "MET#vacia", "METHOD#TIPO_MET void id ( ) { BODY_MET }", "TIPO_MET#public", "TIPO_MET#private",
                                 "BODY_MET#DEC STMNT", "STMNT#id AC STMNT", "STMNT#CIC { STMNT } STMNT", "STMNT#print ( MENS ) ; STMNT",	"STMNT#vacia", "AC#ASIG", "AC#( ) ;", "ASIG#= V_ASIG ;", "V_ASIG#SIMB",	"V_ASIG#read ( )",
@@ -57,7 +86,7 @@ public class Sintactico
         {"", "", "", "", "", "", "", "", "I27", "I28", "", "", "", "", "I26", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "I25", "I40", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
         {"p10", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "p10", "p10", "p10", "", "p10", "", "p10", "", "p10", "p10", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
         {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "I41", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
-        {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "I41", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
+        {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "I42", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
         {"p12", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "p12", "p12", "p12", "", "p12", "", "p12", "", "p12", "p12", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
         {"p9", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "p9", "p9", "p9", "", "p9", "", "p9", "", "p9", "p9", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
         {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "I43", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
@@ -143,7 +172,7 @@ public class Sintactico
         {"I50", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "p25", "I53", "I54", "", "I52", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "I124", "", "", "", "I51", "", "", "", "", "", "", "", "", "", ""},
         {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "p59", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
         {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "p33", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
-        {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "p24", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+        {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "p24", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
     };
     
     public void Sintactico(String token)
@@ -152,7 +181,7 @@ public class Sintactico
         int col = buscarColumna(token);
         int ren = Integer.parseInt(pila.peek().substring(1));
         String dato = tabla[ren][col];
-        String datoComp;           
+        String datoComp;
         
         if(!dato.isEmpty()) {
             datoComp = dato.startsWith("I") ? dato.substring(1) : dato;
@@ -178,6 +207,49 @@ public class Sintactico
                 pila.push(nuevo);
                 pilaAux();
                 
+                if(prod[0].equals("VAR")) {
+                    switch(simb[0]) {
+                        case "id":
+                            pilaSem.push(buscarTipo(this.dato));
+                            break;
+                        default:
+                            pilaSem.push(Tipo());
+                    }                                
+                }
+                if(prod[0].equals("R")) {
+                    t2 = pilaSem.pop();
+                    t1 = pilaSem.pop();
+                    
+                    if(!comp[t1][t2]) {
+                        error = "No se puede comparar un valor de tipo " + buscarID(t1) + " con un valor de tipo " + buscarID(t2) + ".";
+                        ban = false;
+                        break;
+                    }
+                }
+                
+                if(prod[0].equals("F")) {
+                    switch(simb[0]) {
+                        case "id":
+                            pilaSem.push(buscarTipo(this.dato));
+                            break;
+                        case "num", "litcar", "litcad":
+                            pilaSem.push(Tipo());
+                    }
+                }
+                if(prod[0].equals("E") || prod[0].equals("T")) {
+                    if(simb.length > 1) {
+                        t2 = pilaSem.pop();
+                        t1 = pilaSem.pop();
+
+                        if(exp[t1][t2] == -1){
+                            error = "La operación de " + Operacion(simb[1]) + " entre " + buscarID(t1) + " y " + buscarID(t2) + " no puede realizarse";
+                            ban = false;
+                            break;
+                        } else
+                            pilaSem.push(exp[t1][t2]);
+                    }
+                }             
+                
                 ren = Integer.parseInt(pila.peek().substring(1));
                 col = buscarColumna(token);
                 dato = tabla[ren][col];
@@ -188,10 +260,24 @@ public class Sintactico
                     break;
                 }
             }
-            if(ban) {
+            if(ban) {                
+                if(pila.peek().equals("I26")) {
+                    t1 = buscarTipo(pilaID.peek());
+                    t2 = Tipo();
+                    if(!reglaAsig[t1][t2]) {
+                        error = "La variable " + pilaID.peek() + " de tipo " + buscarID(t1) + " no puede recibir un " + buscarID(t2) + ".";
+                        return;
+                    }
+                }                    
+                
                 pila.push(token);
                 pila.push(dato);
                 pilaAux();
+                
+                System.out.println("PILA SEMANTICA");
+        for(Integer numero : pilaSem)
+            System.out.println(numero);
+        System.out.println();
             }
         } else {
             errSint = true;
@@ -220,18 +306,21 @@ public class Sintactico
     
     public void Reinicio()
     {
+        var = "";
+        dato = "";
+        error = "";
+        t1 = -1;
+        t2 = -1;
         pilaAux.clear();
         pila.clear();
         pila.push("$");
         pila.push("I0");
         pilaAux.push("$I0");
         errSint = false;
-        error = "";
-    }
-    
-    public boolean Error()
-    {
-        return errSint;
+        temp.clear();
+        pilaSem.clear();
+        tablaSim = new ArrayList<>();
+        pilaID.clear();
     }
     
     public String Esperado()
@@ -248,5 +337,78 @@ public class Sintactico
     public Stack<String> Pila()
     {
         return pilaAux;
+    }
+    
+    private int Tipo()
+    {
+        String entero = "^[+-]?\\d+$";
+        
+        switch(var) {           
+            case "num":
+                if(dato.matches(entero))
+                    return 0;
+                else
+                    return 1;
+            case "litcar":
+                return 2;
+            case "litcad":
+                return 3;
+        }
+        return -1;
+    }
+    
+    private int buscarTipo(String lexema)
+    {
+        for(String[] vars: tablaSim)
+            if(vars[0].equals(lexema)) {
+                return Integer.parseInt(vars[1]);
+            }
+        return -1;
+    }
+    
+    private String buscarID(int tipo)
+    {
+        switch(tipo) {
+            case 0 : 
+                return "int"; 
+            case 1:
+                return "float";
+            case 2:
+                return "char";
+            case 3:
+                return "String";
+        }
+        return "";
+    }
+    
+    private String Operacion(String op)
+    {
+        switch(op) {
+            case "+":
+                return "suma";
+            case "-":
+                return "resta";
+            case "*":
+                return "multiplicación";
+            case "/":
+                return "división";
+        }
+        return "";
+    }
+    
+    public void Variable(String token, String lexema)
+    {
+        var = token;
+        dato = lexema;
+    }
+    
+    public void Tabla(List<String[]> tablaSim)
+    {
+        this.tablaSim = tablaSim;
+    }
+    
+    public void ID(String id)
+    {
+        pilaID.push(id);
     }
 }

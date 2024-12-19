@@ -1,5 +1,10 @@
 public class Ejemplo 
 {
-	void () {
-	}
+    String cad;
+    int con = 0;
+    float b, c;
+     
+     void main() {
+	con = 90 - b * (b / c);
+     }
 }
