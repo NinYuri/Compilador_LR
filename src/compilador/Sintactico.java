@@ -274,6 +274,11 @@ public class Sintactico
                 if((pila.peek().equals("I46") || pila.peek().equals("I56") || pila.peek().equals("I121")) && token.equals("id")) {                   
                     varAsig = buscarTipo(datoVar);
                     variable = datoVar;
+                    
+                    // Método
+                    if(varAsig == 4) {
+                        
+                    }
                 }
                 if(pila.peek().equals("I66") && token.equals(";")) {
                     if(!pilaSem.isEmpty()) {

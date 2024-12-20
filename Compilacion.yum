@@ -1,21 +1,17 @@
-public class Ejemplo {
+public class Ejemplo 
+{
+    String cad = "";
 
-    int valorInicial = 20;
-    String progreso = "";
-
-    public void Analizar() {
-        int dato;
-        if (dato >= 15) {
-            print("Dato válido");
-            while (dato != 5) {
-                print("Analizando..." + dato);
-                progreso = "En curso";
-                dato = read();
-            }
-        }
-    }
-
-    void main() {
-        Analizar();
-    }
+     public void Hola() {
+         int con = 0;
+         if(con != 6) {
+            cad = "menor";
+         }
+	
+     }
+     
+     void main() {
+	while(con > 8)
+	
+     }
 }
