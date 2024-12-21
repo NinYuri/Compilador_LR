@@ -176,7 +176,7 @@ public class Sintactico
         {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "p33", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""},
         {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "p24", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
     };
-    
+
     public void Sintactico(String token)
     {
         boolean ban = true;
@@ -271,18 +271,16 @@ public class Sintactico
                         return;
                     }
                 }
-                if((pila.peek().equals("I46") || pila.peek().equals("I56") || pila.peek().equals("I121")) && token.equals("id")) {                   
+                if((pila.peek().equals("I46") || pila.peek().equals("I56") || pila.peek().equals("I121") || pila.peek().equals("I100")) && token.equals("id")) {                   
                     varAsig = buscarTipo(datoVar);
                     variable = datoVar;
-                    
-                    // Método
-                    if(varAsig == 4) {
-                        
-                    }
                 }
                 if(pila.peek().equals("I66") && token.equals(";")) {
                     if(!pilaSem.isEmpty()) {
                         if(!reglaAsig[varAsig][pilaSem.peek()]) {
+                            System.out.println("Var" + variable);
+                            System.out.println("Tipo" + varAsig);
+                            System.out.println("Pila" + pilaSem.peek());
                             error = "La variable " + variable + " de tipo " + buscarID(varAsig) + " no puede recibir un " + buscarID(pilaSem.peek()) + ".";
                             pilaSem.pop();
                             return;

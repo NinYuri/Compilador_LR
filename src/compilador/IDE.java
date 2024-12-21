@@ -23,7 +23,7 @@ public class IDE extends javax.swing.JFrame
     List<String[]> tablaVal = new ArrayList<>();
     Stack<String> expPosfija = new Stack<>();
     Stack<String> tempMain = new Stack<>();
-    List<String> valMain = new ArrayList<>();
+    Stack<String> valMain = new Stack<>();
     Stack<String> tempMet = new Stack<>();
     Stack<String> auxiliar = new Stack<>();
     Stack<String> variables = new Stack<>();
@@ -66,7 +66,7 @@ public class IDE extends javax.swing.JFrame
             StringBuilder codInt = new StringBuilder();
             boolean banMet = false;
             boolean banMain = false;
-            int conVal = 0;
+            boolean valor = false;
             Tokens token = lexer.yylex();
             
             while(ban) {
@@ -119,6 +119,7 @@ public class IDE extends javax.swing.JFrame
                                 sint.Tabla(tablaSim);
                                 sint.ID(lexer.lexeme);
                                 variables.push(String.valueOf(lexer.lexeme));
+                                valor = true;
                                 token = Tokens.id;
                             } else if(token == Tokens.idMet) {
                                 Tabla(String.valueOf(token), String.valueOf(lexer.lexeme), c.linea);
@@ -130,7 +131,7 @@ public class IDE extends javax.swing.JFrame
                             }                            
                             else if(token == Tokens.id) {
                                 if(!buscarID(lexer.lexeme)) {
-                                    error += "Error semántico en la línea " + (c.linea + 1) + ": La variable o método " + lexer.lexeme + " no se encuentra definido.";
+                                    error += "Error semántico en la línea " + (c.linea + 2) + ": La variable o método " + lexer.lexeme + " no se encuentra definido.";
                                     break;
                                 }
                             }                     
@@ -139,9 +140,11 @@ public class IDE extends javax.swing.JFrame
                             sint.Variable(String.valueOf(token), String.valueOf(lexer.lexeme));                            
                             
                             if(token != Tokens.id) {  
-                                conVal++;
-                                if(conVal == variables.size())
-                                    tablaVal.add(new String[]{variables.peek(), String.valueOf(lexer.lexeme)});
+                                if(!banMet || !banMain)
+                                    if(valor) {
+                                        tablaVal.add(new String[]{variables.peek(), String.valueOf(lexer.lexeme)});
+                                        valor = false;
+                                    }
                             }                               
                         }
 
@@ -152,7 +155,7 @@ public class IDE extends javax.swing.JFrame
                         else
                             if(banMain) {
                                 tempMain.push(String.valueOf(token));
-                                valMain.add(String.valueOf(lexer.lexeme));
+                                valMain.push(String.valueOf(lexer.lexeme));
                             }
                         break;
                     case open_key:
@@ -162,8 +165,10 @@ public class IDE extends javax.swing.JFrame
                         if(banMet)
                             tempMet.push(String.valueOf(lexer.lexeme));
                         else
-                            if(banMain)
+                            if(banMain) {
                                 tempMain.push(String.valueOf(lexer.lexeme));
+                                valMain.push(String.valueOf(lexer.lexeme));
+                            }
                         break;
                     case close_key:
                         if(llaves != 0) {
@@ -176,12 +181,15 @@ public class IDE extends javax.swing.JFrame
                         if(banMet)
                             tempMet.push(String.valueOf(lexer.lexeme));
                         else
-                            if(banMain)
+                            if(banMain) {
                                 tempMain.push(String.valueOf(lexer.lexeme));
+                                valMain.push(String.valueOf(lexer.lexeme));
+                            }
                         break;  
                     case mainType:
                         resLexico += lexer.lexeme + "\n";
                         sint.Sintactico(String.valueOf(lexer.lexeme));
+                        Tabla(String.valueOf(token), String.valueOf(lexer.lexeme), c.linea);
                         tempMain.push("Etq" + String.valueOf(lexer.lexeme) + ":");
                         banMain = true;
                         banMet = false;
@@ -192,8 +200,10 @@ public class IDE extends javax.swing.JFrame
                         if(banMet)
                             tempMet.push(String.valueOf(lexer.lexeme));
                         else
-                            if(banMain)
+                            if(banMain) {
                                 tempMain.push(String.valueOf(lexer.lexeme));
+                                valMain.push(String.valueOf(lexer.lexeme));
+                            }
                         break;
                 }
                 if(!error.equals("")) {
@@ -298,6 +308,8 @@ public class IDE extends javax.swing.JFrame
             case "idMet":
                 tablaSim.add(new String[]{lexema, "m"});
                 break;
+            case "mainType":
+                tablaSim.add(new String[] {lexema, "m"});
         }
     }
     
@@ -358,21 +370,19 @@ public class IDE extends javax.swing.JFrame
                         mensaje += valor;
                     else
                         mensaje += ";";
-                    expPosfija.push(mensaje);
-                    break;
+                    expPosfija.push(mensaje);                    
+                    break;                    
                 case "":
                     if(banMain) {
-                        pilaMain();
-                        for(String car : tempMain)
-                            expPosfija.push(car);
-                        expPosfija.push("exit();");
+                        pilaInterm("Main");
+                        expPosfija.push("exit(0);");
                     }
-                    if(!tempMet.isEmpty()) {
+                    /*if(!tempMet.isEmpty()) {
                         pilaMet();
                         for(String car : tempMet)
                             expPosfija.push(car);                                            
                         expPosfija.push("goto EtiqReturn" + lexema);
-                    }
+                    }*/
                     return;
                 default:
                     break;
@@ -389,38 +399,104 @@ public class IDE extends javax.swing.JFrame
         return "";
     }
     
-    private void pilaMet()
+    private void pilaInterm(String contex)
     {
-        String token, mensaje;
+        String token, valor, mensaje;
         boolean ini = false;
         int conIf = 0, conWhile = 0, varIf = 0, varWhile = 0;
         Stack<String> pilaContexto = new Stack<>();
+        Stack<String> temporal = new Stack<>();
+        auxiliar.clear();
         
-        while(!tempMet.isEmpty())
-            auxiliar.push(tempMet.pop());
+        if(contex.equals("Metodo")) {
+            while(!tempMet.isEmpty())
+                auxiliar.push(tempMet.pop());            
+        } else {
+            while(!tempMain.isEmpty())
+                auxiliar.push(tempMain.pop());
+            while(!valMain.isEmpty())
+                temporal.push(valMain.pop());
+        }
+ 
+        expPosfija.push("\n" + auxiliar.pop());
         
-        tempMet.push("\n" + auxiliar.pop());
-        while(!auxiliar.isEmpty()) {
+        while(!auxiliar.isEmpty() && !temporal.isEmpty()) {
             while(!ini) {
                 token = auxiliar.pop();
+                valor = temporal.pop();
                 if(token.equals("{")) {
                     ini = true;
                     break;
                 }       
             }
             token = auxiliar.pop();
+            valor = temporal.pop();
             
             switch(token) {
-                case "int", "float", "char", "String":
+                case "int", "float", "char":
                     mensaje = token + " ";
                     do {
-                        mensaje += auxiliar.pop() + " ";
-                    } while(!auxiliar.peek().equals(";"));                    
+                        if(temporal.peek().equals(","))
+                            mensaje = mensaje.trim() + temporal.pop() + " ";
+                        else
+                            mensaje += temporal.pop() + " ";
+                        auxiliar.pop();
+                    } while(!temporal.peek().equals(";"));
                     
-                    mensaje = mensaje.trim() + auxiliar.pop();
-                    tempMet.push(mensaje);
+                    mensaje = mensaje.trim() + temporal.pop();
+                    auxiliar.pop();                    
+                    expPosfija.push(mensaje);
+                    break;
+                case "String":
+                    mensaje = "char ";                    
+                    do {
+                        if(temporal.peek().equals(",")) {
+                            mensaje = mensaje.trim();
+                            for(int i = 0; i < 2; i++) {
+                                mensaje += temporal.pop() + " ";
+                                auxiliar.pop();
+                            }
+                            mensaje = mensaje.trim() + "[100] ";
+                        } else {
+                            mensaje += temporal.pop();
+                            auxiliar.pop();
+                            mensaje += "[100] ";
+                        }
+                                                
+                        while(!temporal.peek().equals(",") && !temporal.peek().equals(";")) {
+                            mensaje += temporal.pop() + " ";
+                            auxiliar.pop();
+                        }       
+                    } while(temporal.peek().equals(","));
+                    
+                    mensaje = mensaje.trim() + temporal.pop();
+                    auxiliar.pop();                    
+                    expPosfija.push(mensaje);
                     break;
                 case "print":
+                    boolean ban = false;
+                    mensaje = "printf";                                      
+                    do {
+                        token = auxiliar.pop();
+                        mensaje += temporal.pop() + " ";  
+                        
+                        if(token.equals("litcad"))
+                            ban = true;
+                    } while(!temporal.peek().equals(")"));
+                    
+                    if(!ban)
+                        mensaje += ", \"\"" + temporal.pop();
+                    else
+                        mensaje += temporal.pop();
+                    auxiliar.pop();
+                    
+                    mensaje += temporal.pop();
+                    auxiliar.pop();
+                    expPosfija.push(mensaje);
+                    break;
+                    
+                    
+                /*case "print":
                     mensaje = token + " ";
                     do {
                         mensaje += auxiliar.pop() + " ";
@@ -428,7 +504,7 @@ public class IDE extends javax.swing.JFrame
                     
                     mensaje = mensaje.trim() + auxiliar.pop();
                     tempMet.push(mensaje);
-                    break;
+                    break;*/
                 case "id":
                     mensaje = token + " ";
                     token = auxiliar.pop();
@@ -607,7 +683,10 @@ public class IDE extends javax.swing.JFrame
                     pilaContexto.push("While" + conWhile);
                     break;
                 case "{":
-                    break;
+                    if(auxiliar.isEmpty())
+                        return;
+                    else
+                        break;
                 case "}":
                 if(!pilaContexto.isEmpty()) {
                     String contexto = pilaContexto.pop();
@@ -1151,16 +1230,13 @@ public class IDE extends javax.swing.JFrame
             System.out.println(car);
         System.out.println();
         
-        System.out.println("TABLA DE SIMBOLOS");
-        for(String[] fila : tablaSim) {
-            for(String dato : fila)
-                System.out.print(dato + "\t");            
-            System.out.println();
-        }
+        System.out.println("PILA VALORES Main");
+        for(String car : valMain)
+            System.out.println(car);
         System.out.println();
         
-        System.out.println("TABLA DE VALORES");
-        for(String[] fila : tablaVal) {
+        System.out.println("TABLA DE SIMBOLOS");
+        for(String[] fila : tablaSim) {
             for(String dato : fila)
                 System.out.print(dato + "\t");            
             System.out.println();
@@ -1199,7 +1275,7 @@ public class IDE extends javax.swing.JFrame
         expPosfija.clear();
         tempMet.clear();
         tempMain.clear();
-        valMain = new ArrayList<>();
+        valMain.clear();
         auxiliar.clear();
         variables.clear();
         pilaOpers.clear();

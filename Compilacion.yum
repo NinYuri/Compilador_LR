@@ -1,17 +1,17 @@
-public class Ejemplo 
+public class Nombre 
 {
-    String cad = "";
+	int a, b;
+	String nombre = "";
 
-     public void Hola() {
-         int con = 0;
-         if(con != 6) {
-            cad = "menor";
-         }
-	
-     }
-     
-     void main() {
-	while(con > 8)
-	
-     }
+	void main() {
+		int val;
+		float bi = 9.0, g;
+		String nom, pro = "Hola";
+
+		print("Yuri");
+		print(nombre);
+
+		//if(a > b)
+		//{}
+	}
 }
