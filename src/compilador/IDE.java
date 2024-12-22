@@ -30,6 +30,7 @@ public class IDE extends javax.swing.JFrame
     Stack<String> pilaOpers = new Stack<>();
     Stack<String> temp = new Stack<>();
     Stack<String> aux = new Stack<>();
+    Stack<String> pilaInterm = new Stack<>();
     String error = "";
     int llaves = 0;            
     
@@ -88,10 +89,14 @@ public class IDE extends javax.swing.JFrame
                     jTPSintactico.setText(texto.toString());
                     
                     codInter();
-                    System.out.println("DESPUES DE METODOS");
-                    for(String var : expPosfija)
-                        codInt.append(var).append("\n");
-                    jTPCodInt.setText(codInt.toString());
+                    if(error.equals("")) {
+                        for(String var : expPosfija)
+                            codInt.append(var).append("\n");
+                        jTPCodInt.setText(codInt.toString());
+                    } else {
+                        jTPError.setText("Error semántico en la línea " + (c.linea + 1) + ": " + error);
+                        return;
+                    }
                     
                     ban = false;
                     return;
@@ -104,11 +109,7 @@ public class IDE extends javax.swing.JFrame
                         pilaSint = sint.Pila();                 
                         for(String reng : pilaSint)
                             texto.append(reng).append("\n");
-                        jTPSintactico.setText(texto.toString());
-                        codInter();
-                        for(String var : expPosfija)
-                            codInt.append(var).append("\n");
-                        jTPCodInt.setText(codInt.toString());
+                        jTPSintactico.setText(texto.toString());                        
                         return;
                     case id, idI, idF, idC, idS, idClass, idMet, num, litcar, litcad:
                         if(token == Tokens.idClass)
@@ -214,10 +215,6 @@ public class IDE extends javax.swing.JFrame
                         texto.append(reng).append("\n");
                     jTPSintactico.setText(texto.toString());
                     jTPError.setText(error);
-                    codInter();
-                    for(String var : expPosfija)
-                        codInt.append(var).append("\n");
-                    jTPCodInt.setText(codInt.toString());
                     return;
                 }
                 if(sint.errSint) {
@@ -228,10 +225,6 @@ public class IDE extends javax.swing.JFrame
                         texto.append(reng).append("\n");
                     jTPSintactico.setText(texto.toString());
                     jTPError.setText("Error sintáctico en la línea " + (c.linea + 1) + ": Se recibició un " + lexer.lexeme + " cuando se esperaba un " + sint.Esperado() + ".");
-                    codInter();
-                    for(String var : expPosfija)
-                        codInt.append(var).append("\n");
-                    jTPCodInt.setText(codInt.toString());
                     return;
                 }
                 if(!sint.error.equals("")) {
@@ -242,10 +235,6 @@ public class IDE extends javax.swing.JFrame
                         texto.append(reng).append("\n");
                     jTPSintactico.setText(texto.toString());
                     jTPError.setText("Error semántico en la línea " + (c.linea + 1) + ": " + sint.error);
-                    codInter();
-                    for(String var : expPosfija)
-                        codInt.append(var).append("\n");
-                    jTPCodInt.setText(codInt.toString());
                     return;
                 }
                 token = lexer.yylex();
@@ -375,8 +364,11 @@ public class IDE extends javax.swing.JFrame
                 case "":
                     if(banMain) {
                         pilaInterm("Main");
+                        expPosfija.push("");
+                        for(String car: pilaInterm)
+                            expPosfija.push(car);
                         expPosfija.push("exit(0);");
-                    }
+                    } //valida que la cadena de error este vacia antes de metodos
                     /*if(!tempMet.isEmpty()) {
                         pilaMet();
                         for(String car : tempMet)
@@ -399,11 +391,19 @@ public class IDE extends javax.swing.JFrame
         return "";
     }
     
+    private String Scan(String lexema)
+    {
+        for(String[] val: tablaSim)
+            if(val[0].equals(lexema))
+                return val[1];
+        return "";
+    }
+    
     private void pilaInterm(String contex)
     {
-        String token, valor, mensaje;
-        boolean ini = false;
-        int conIf = 0, conWhile = 0, varIf = 0, varWhile = 0;
+        String token, valor, mensaje = "", dato;
+        boolean ini = false, ban = false, inCad = false;
+        int conIf = 0, conWhile = 0, varIf = 0, varWhile = 0, endIndex;
         Stack<String> pilaContexto = new Stack<>();
         Stack<String> temporal = new Stack<>();
         auxiliar.clear();
@@ -473,66 +473,148 @@ public class IDE extends javax.swing.JFrame
                     auxiliar.pop();                    
                     expPosfija.push(mensaje);
                     break;
+                    
                 case "print":
-                    boolean ban = false;
-                    mensaje = "printf";                                      
-                    do {
-                        token = auxiliar.pop();
-                        mensaje += temporal.pop() + " ";  
-                        
-                        if(token.equals("litcad"))
-                            ban = true;
-                    } while(!temporal.peek().equals(")"));
-                    
-                    if(!ban)
-                        mensaje += ", \"\"" + temporal.pop();
-                    else
-                        mensaje += temporal.pop();
-                    auxiliar.pop();
-                    
-                    mensaje += temporal.pop();
-                    auxiliar.pop();
-                    expPosfija.push(mensaje);
-                    break;
-                    
-                    
-                /*case "print":
-                    mensaje = token + " ";
-                    do {
-                        mensaje += auxiliar.pop() + " ";
-                    } while(!auxiliar.peek().equals(";"));
-                    
-                    mensaje = mensaje.trim() + auxiliar.pop();
-                    tempMet.push(mensaje);
-                    break;*/
-                case "id":
-                    mensaje = token + " ";
+                    mensaje = "printf" + temporal.pop();
+                    auxiliar.pop();                    
                     token = auxiliar.pop();
+                    valor = temporal.pop();
                     
-                    if(token.equals("=")) {
-                        mensaje += token + " ";
-                        
-                        token = auxiliar.pop();
-                        if(token.equals("read")) {
-                            mensaje += token;
-                            do {
-                                mensaje += auxiliar.pop();
-                            } while(!auxiliar.peek().equals(";"));
-                            mensaje += auxiliar.pop();
-                        } else {
-                            Posfija(token);
-                            do {
-                                Posfija(auxiliar.pop());
-                            } while(!auxiliar.peek().equals(";"));
-                            Posfija(auxiliar.pop());
-                            codOper();
-                            mensaje += " v1;";
+                    if(token.equals(")")) {
+                        mensaje += "\"\\n\"" + valor + temporal.pop();
+                        auxiliar.pop();
+                        pilaInterm.push(mensaje);
+                        break;
+                    } else 
+                        if(token.equals("id")) {
+                            dato = Printf(valor);
+                            if(!error.isEmpty() && dato.isEmpty())
+                                return;
+                            else
+                                mensaje += dato;
+                        } else
+                            if(token.equals("litcad")) {
+                                dato = valor.substring(0, valor.length() - 1);  
+                                mensaje += dato + "\\n\"";   
+                                inCad = true;
+                            }
+                                
+                    if(!temporal.peek().equals("+")) {
+                        for(int i = 0; i < 2; i++) {
+                            mensaje += temporal.pop();
+                            auxiliar.pop();
                         }
-                    } else
-                        mensaje = mensaje.trim() + token + auxiliar.pop() + auxiliar.pop();                                                                                                                    
+                    } else { 
+                        endIndex = mensaje.indexOf("\\n");
+                        mensaje = mensaje.substring(0, endIndex);
+                        temporal.pop();
+                        auxiliar.pop();
+                                    
+                        while(!temporal.peek().equals(")")) {
+                            if(auxiliar.peek().equals("+")) {
+                                auxiliar.pop();
+                                temporal.pop();
+                            }
+                            if(auxiliar.peek().equals("litcad")) {
+                                dato = temporal.pop();
+                                auxiliar.pop();
+                                dato = dato.substring(1, dato.length() - 1);                                        
+                                mensaje += dato;
+                                ban = true;
+                            } else
+                                if(auxiliar.peek().equals("id")) {
+                                    String val = "";
+                                                
+                                    if(!inCad) {
+                                        val = valor;
+                                        valor = temporal.pop();
+                                    } else
+                                        valor = temporal.pop();
+                                        auxiliar.pop();                                                
+                                                
+                                        dato = Printf(valor);
+                                        if(!error.isEmpty() && dato.isEmpty())
+                                            return;
+                                        else {
+                                            mensaje += dato.substring(1);
+                                                    
+                                            if(!inCad) {
+                                                endIndex = mensaje.indexOf(valor);
+                                                mensaje = mensaje.substring(0, endIndex) + " ";
+                                                mensaje += val + ", " + valor;                                                        
+                                            }          
+                                            ban = false;
+                                        }
+                                }
+                        }
+                        if(ban)
+                            mensaje += "\\n\", " + valor;
+
+                        for(int i = 0; i < 2; i++) {
+                            mensaje += temporal.pop();
+                            auxiliar.pop();
+                            }
+                        }
+                    pilaInterm.push(mensaje);
+                    break;           
+                    
+                case "id":
+                    if(auxiliar.peek().equals("(")) {
+                        mensaje = "goto Etiq" + valor + ";\nEtiqReturn" + valor + ":";                        
                         
-                    tempMet.push(mensaje);
+                        while(!auxiliar.peek().equals(";")) {
+                            temporal.pop();
+                            auxiliar.pop();
+                        }
+                        temporal.pop();
+                        auxiliar.pop();                                                
+                    } else 
+                        if(auxiliar.peek().equals("=")) {
+                            mensaje = valor + " " + temporal.pop() + " ";
+                            auxiliar.pop();
+
+                            if(auxiliar.peek().equals("read")) {
+                                mensaje = "scanf(\"%";
+                                for(int i = 0; i < 2; i++) {
+                                    temporal.pop();
+                                    auxiliar.pop();
+                                }                                
+
+                                switch(Scan(valor)) {
+                                    case "0":
+                                        mensaje += "d\", &" + valor;
+                                        break;
+                                    case "1":
+                                        mensaje += "f\", &" + valor;
+                                        break;
+                                    case "2":
+                                        mensaje = "scanf(\" %c\", &" + valor;
+                                        break;
+                                    case "3":
+                                        mensaje += "s\", " + valor;
+                                        break;
+                                    default:
+                                        error = "No se puede asignar un valor a un método.";
+                                        return; 
+                                }
+                                
+                                for(int i = 0; i < 2; i++) {
+                                    mensaje += temporal.pop();
+                                    auxiliar.pop();
+                                }                                
+                            } else {
+                                Posfija(auxiliar.pop(), temporal.pop());
+                                do {
+                                    Posfija(auxiliar.pop(), temporal.pop());
+                                } while(!auxiliar.peek().equals(";"));
+                                Posfija(auxiliar.pop(), temporal.pop());
+                                codOper();
+                                mensaje += " v1;";
+                            }                            
+                        }    
+                    pilaInterm.push(mensaje);
                     break;
+                    
                 case "if":
                     mensaje = token + " ";
                     do {
@@ -562,8 +644,10 @@ public class IDE extends javax.swing.JFrame
                     tempMet.push("goto Fin_While" + conWhile);
                     pilaContexto.push("While" + conWhile);
                     break;
+                    
                 case "{":
                     break;
+                    
                 case "}":
                 if(!pilaContexto.isEmpty()) {
                     String contexto = pilaContexto.pop();
@@ -579,6 +663,23 @@ public class IDE extends javax.swing.JFrame
                 }
                 break;
             }
+        }
+    }
+    
+    private String Printf(String valor)
+    {
+        switch(Scan(valor)) {
+            case "0":
+                return "\"%d\\n\", " + valor;
+            case "1":
+                return "\"%f\\n\", " + valor;
+            case "2":
+                return "\"%c\\n\", " + valor;
+            case "3":
+                return "\"%s\\n\", " + valor;
+            default:
+                error = "No se puede imprimir un método.";
+                return ""; 
         }
     }
     
@@ -603,56 +704,7 @@ public class IDE extends javax.swing.JFrame
             }
             token = auxiliar.pop();
             
-            switch(token) {
-                case "int", "float", "char", "String":
-                    mensaje = token + " ";
-                    do {
-                        mensaje += auxiliar.pop() + " ";
-                    } while(!auxiliar.peek().equals(";"));                    
-                    
-                    mensaje = mensaje.trim() + auxiliar.pop();
-                    tempMain.push(mensaje);
-                    break;
-                case "print":
-                    mensaje = token + " ";
-                    do {
-                        mensaje += auxiliar.pop() + " ";
-                    } while(!auxiliar.peek().equals(";"));
-                    
-                    mensaje = mensaje.trim() + auxiliar.pop();
-                    tempMain.push(mensaje);
-                    break;
-                case "id":
-                    mensaje = token + " ";
-                    token = auxiliar.pop();
-                    
-                    if(token.equals("=")) {
-                        mensaje += token + " ";
-                        
-                        token = auxiliar.pop();
-                        if(token.equals("read")) {
-                            mensaje += token;
-                            do {
-                                mensaje += auxiliar.pop();
-                            } while(!auxiliar.peek().equals(";"));
-                            mensaje += auxiliar.pop();
-                        } else {
-                            Posfija(token);
-                            do {
-                                Posfija(auxiliar.pop());
-                            } while(!auxiliar.peek().equals(";"));
-                            Posfija(auxiliar.pop());
-                            codOper();
-                            mensaje += " v1;";
-                        }
-                    } else {
-                        temp = mensaje.trim();
-                        mensaje = "goto Etiq" + buscarM() + ";\n";
-                        mensaje += "EtiqReturn" + buscarM();                          
-                    }
-                        
-                    tempMain.push(mensaje);
-                    break;
+            switch(token) {                
                 case "if":
                     mensaje = token + " ";
                     do {
@@ -705,10 +757,10 @@ public class IDE extends javax.swing.JFrame
         }
     }
     
-    private void Posfija(String lexema)
+    private void Posfija(String token, String lexema)
     {
         int prioCima, prioToken;
-        if(lexema.equals("id") || lexema.equals("num"))
+        if(token.equals("id") || token.equals("num"))
             temp.push(lexema);
         else {
             switch(lexema) {
@@ -760,56 +812,50 @@ public class IDE extends javax.swing.JFrame
     private void codOper()
     {
         int cont = 1;
+        
         while(!temp.isEmpty())
             aux.push(temp.pop());
         
         while(!aux.isEmpty()) {            
             String var = aux.pop();
             
-            if(var.equals("id") || var.equals("num"))
-                tempMet.push("v" + cont++ + " = " + var + ";");
+            if(var.matches("[a-zA-Z]+") || var.matches("\\d+")) {                
+                if(!expPosfija.peek().equals("int v" + cont + ";"))
+                    expPosfija.push("int v" + cont + ";");
+                pilaInterm.push("v" + cont++ + " = " + var + ";");                
+            }
             else
                 switch(var) {
                     case "+":
                         cont -= 2;
                         if(cont == 0)
-                            tempMet.push("v" + ++cont + " = +v" + cont + ";");
+                            pilaInterm.push("v" + ++cont + " = +v" + cont + ";");
                         else
-                            tempMet.push("v" + cont + " = v" + cont + " + v" + ++cont + ";");
+                            pilaInterm.push("v" + cont + " = v" + cont + " + v" + ++cont + ";");
                         break;
                     case "-":
                         cont -= 2;
                         if(cont == 0)
-                            tempMet.push("v" + ++cont + " = -v" + cont + ";"); 
+                            pilaInterm.push("v" + ++cont + " = -v" + cont + ";"); 
                         else
-                            tempMet.push("v" + cont + " = v" + cont + " - v" + ++cont + ";");
+                            pilaInterm.push("v" + cont + " = v" + cont + " - v" + ++cont + ";");
                         break;
                     case "/":
                         cont -= 2;
-                        tempMet.push("v" + cont + " = v" + cont + " / v" + ++cont + ";");
+                        pilaInterm.push("v" + cont + " = v" + cont + " / v" + ++cont + ";");
                         break;
                     case "*":
                         cont -= 2;
-                        tempMet.push("v" + cont + " = v" + cont + " * v" + ++cont + ";");                       
+                        pilaInterm.push("v" + cont + " = v" + cont + " * v" + ++cont + ";");                       
                 }            
         }
         cont--;
         if(cont == 0)
-            tempMet.push("v" + ++cont + " = v" + cont + " ;");
+            pilaInterm.push("v" + ++cont + " = v" + cont + ";");
         else
-            tempMet.push("v" + cont + " = v" + cont + " ;");
-    }
-    
-    private String buscarM() 
-    {
-        for(String[] fila : tablaSim) {
-            if(fila[1].equals("m"))
-                return fila[0];            
-        }
-        return null;
+            pilaInterm.push("v" + cont + " = v" + cont + ";");
     }
 
-    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -929,6 +975,7 @@ public class IDE extends javax.swing.JFrame
         jTPCode.setBackground(new java.awt.Color(36, 38, 48));
         jTPCode.setFont(new java.awt.Font("Bahnschrift", 0, 18)); // NOI18N
         jTPCode.setForeground(new java.awt.Color(255, 255, 255));
+        jTPCode.setAutoscrolls(false);
         jScrollPane1.setViewportView(jTPCode);
 
         jTPLexico.setEditable(false);
@@ -1094,7 +1141,7 @@ public class IDE extends javax.swing.JFrame
                     .addComponent(lblOpen, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblNew, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1112,7 +1159,7 @@ public class IDE extends javax.swing.JFrame
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
                     .addComponent(jScrollPane5))
-                .addContainerGap(60, Short.MAX_VALUE))
+                .addGap(60, 60, 60))
         );
 
         pack();
@@ -1279,6 +1326,7 @@ public class IDE extends javax.swing.JFrame
         auxiliar.clear();
         variables.clear();
         pilaOpers.clear();
+        pilaInterm.clear();
         aux.clear();
         temp.clear();
         error = "";

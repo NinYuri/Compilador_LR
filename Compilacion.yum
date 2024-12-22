@@ -1,15 +1,33 @@
 public class Nombre 
 {
 	int a, b;
-	String nombre = "";
+	String nombre = "Ibarra";
+	char c;
+
+	public void Analizar() {}
 
 	void main() {
 		int val;
 		float bi = 9.0, g;
-		String nom, pro = "Hola";
+		String nom = "Yuri", pro = "Hola";
+		char car;
 
-		print("Yuri");
-		print(nombre);
+		g = -(90+ (bi * 10/5) * 40);
+
+		/*print(pro + " un gusto " + nom);
+		print();
+		print(nom);
+		print(pro + " un gusto");
+		print(nom + pro);
+		print("Yuriana" + pro);
+		print("Hola" + "Yuri"+ pro);*/
+		
+		
+		Analizar();
+		Analizar = read();
+		//g = read();
+		//nombre = read();
+		//c = read();
 
 		//if(a > b)
 		//{}
