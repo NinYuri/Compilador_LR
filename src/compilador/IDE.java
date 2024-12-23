@@ -25,14 +25,17 @@ public class IDE extends javax.swing.JFrame
     Stack<String> tempMain = new Stack<>();
     Stack<String> valMain = new Stack<>();
     Stack<String> tempMet = new Stack<>();
+    Stack<String> valMet = new Stack<>();
     Stack<String> auxiliar = new Stack<>();
     Stack<String> variables = new Stack<>();
     Stack<String> pilaOpers = new Stack<>();
     Stack<String> temp = new Stack<>();
     Stack<String> aux = new Stack<>();
     Stack<String> pilaInterm = new Stack<>();
+    List<String> varCodin = new ArrayList<>();
     String error = "";
-    int llaves = 0;            
+    int llaves = 0;
+    boolean cadena = false;
     
     public IDE() 
     {
@@ -142,7 +145,7 @@ public class IDE extends javax.swing.JFrame
                             
                             if(token != Tokens.id) {  
                                 if(!banMet || !banMain)
-                                    if(valor) {
+                                    if(valor && !banMet && !banMain) {
                                         tablaVal.add(new String[]{variables.peek(), String.valueOf(lexer.lexeme)});
                                         valor = false;
                                     }
@@ -151,8 +154,10 @@ public class IDE extends javax.swing.JFrame
 
                         resLexico += token + "\n";                        
                         sint.Sintactico(String.valueOf(token));
-                        if(banMet)
+                        if(banMet) {
                             tempMet.push(String.valueOf(token));
+                            valMet.push(String.valueOf(lexer.lexeme));
+                        }
                         else
                             if(banMain) {
                                 tempMain.push(String.valueOf(token));
@@ -163,8 +168,10 @@ public class IDE extends javax.swing.JFrame
                         llaves++;
                         resLexico += lexer.lexeme + "\n";
                         sint.Sintactico(String.valueOf(lexer.lexeme));
-                        if(banMet)
+                        if(banMet) {
                             tempMet.push(String.valueOf(lexer.lexeme));
+                            valMet.push(String.valueOf(lexer.lexeme));
+                        }
                         else
                             if(banMain) {
                                 tempMain.push(String.valueOf(lexer.lexeme));
@@ -179,8 +186,10 @@ public class IDE extends javax.swing.JFrame
                         }                          
                         else
                             error += "Error sintáctico en la línea " + (c.linea + 1) + ": Existe una llave } innecesaria.";                                       
-                        if(banMet)
+                        if(banMet) {
                             tempMet.push(String.valueOf(lexer.lexeme));
+                            valMet.push(String.valueOf(lexer.lexeme));
+                        }
                         else
                             if(banMain) {
                                 tempMain.push(String.valueOf(lexer.lexeme));
@@ -198,8 +207,10 @@ public class IDE extends javax.swing.JFrame
                     default:
                         resLexico += lexer.lexeme + "\n";
                         sint.Sintactico(String.valueOf(lexer.lexeme));
-                        if(banMet)
+                        if(banMet) {
                             tempMet.push(String.valueOf(lexer.lexeme));
+                            valMet.push(String.valueOf(lexer.lexeme));
+                        }
                         else
                             if(banMain) {
                                 tempMain.push(String.valueOf(lexer.lexeme));
@@ -324,37 +335,22 @@ public class IDE extends javax.swing.JFrame
         
         for(String[] varGlob: tablaSim) {
             String lexema = varGlob[0];
-            String tipo = varGlob[1];
-            
+            String tipo = varGlob[1];            
             String valor = buscarVal(lexema);
-        
-            switch(tipoStr(tipo)) {
-                case "int":
-                    mensaje = "int " + lexema;
+            
+            String tipoS = tipoStr(tipo);
+            
+            switch(tipoS) {
+                case "int", "float", "char":
+                    mensaje = tipoS + " " + lexema;
                     if(!valor.equals(""))
                         mensaje += valor;
                     else
                         mensaje += ";";
                     expPosfija.push(mensaje);
-                    break;
-                case "float":
-                    mensaje = "float " + lexema;
-                    if(!valor.equals(""))
-                        mensaje += valor;
-                    else
-                        mensaje += ";";
-                    expPosfija.push(mensaje);
-                    break;
-                case "char":
-                    mensaje = "char " + lexema;
-                    if(!valor.equals(""))
-                        mensaje += valor;
-                    else
-                        mensaje += ";";
-                    expPosfija.push(mensaje);
-                    break;
+                    break;                
                 case "String":
-                    mensaje = "String " + lexema;
+                    mensaje = "char " + lexema + "[100]";
                     if(!valor.equals(""))
                         mensaje += valor;
                     else
@@ -368,13 +364,17 @@ public class IDE extends javax.swing.JFrame
                         for(String car: pilaInterm)
                             expPosfija.push(car);
                         expPosfija.push("exit(0);");
-                    } //valida que la cadena de error este vacia antes de metodos
-                    /*if(!tempMet.isEmpty()) {
-                        pilaMet();
-                        for(String car : tempMet)
-                            expPosfija.push(car);                                            
-                        expPosfija.push("goto EtiqReturn" + lexema);
-                    }*/
+                        expPosfija.push("");
+                        
+                        if(!tempMet.isEmpty()) {
+                            pilaInterm.clear();
+                            pilaInterm("Metodo");                            
+                            expPosfija.push("");
+                            for(String car : pilaInterm)
+                                expPosfija.push(car);                                            
+                            expPosfija.push("goto EtiqReturn" + lexema + ";");
+                        }
+                    }                    
                     return;
                 default:
                     break;
@@ -410,7 +410,9 @@ public class IDE extends javax.swing.JFrame
         
         if(contex.equals("Metodo")) {
             while(!tempMet.isEmpty())
-                auxiliar.push(tempMet.pop());            
+                auxiliar.push(tempMet.pop());
+            while(!valMet.isEmpty())
+                temporal.push(valMet.pop());
         } else {
             while(!tempMain.isEmpty())
                 auxiliar.push(tempMain.pop());
@@ -559,6 +561,7 @@ public class IDE extends javax.swing.JFrame
                     break;           
                     
                 case "id":
+                    cadena = false;
                     if(auxiliar.peek().equals("(")) {
                         mensaje = "goto Etiq" + valor + ";\nEtiqReturn" + valor + ":";                        
                         
@@ -602,46 +605,66 @@ public class IDE extends javax.swing.JFrame
                                     mensaje += temporal.pop();
                                     auxiliar.pop();
                                 }                                
-                            } else {
+                            } else {                                
                                 Posfija(auxiliar.pop(), temporal.pop());
-                                do {
+                                while(!auxiliar.peek().equals(";"))
                                     Posfija(auxiliar.pop(), temporal.pop());
-                                } while(!auxiliar.peek().equals(";"));
+                               
                                 Posfija(auxiliar.pop(), temporal.pop());
-                                codOper();
-                                mensaje += " v1;";
+                                codOper(valor);
+                                mensaje += "v1;";
                             }                            
-                        }    
-                    pilaInterm.push(mensaje);
+                        }
+                    if(!cadena)
+                        pilaInterm.push(mensaje);
                     break;
                     
                 case "if":
                     mensaje = token + " ";
                     do {
-                        mensaje += auxiliar.pop() + " ";
-                    } while(!auxiliar.peek().equals("{")); 
+                        mensaje += temporal.pop() + " ";
+                        auxiliar.pop();
+                    } while(!temporal.peek().equals("{")); 
                     
-                    String[] partes = mensaje.split(" ");
-                    tempMet.push("vc" + (++varIf) + " = " + partes[2] + ";");
-                    tempMet.push("vc" + (++varIf) + " = " + partes[4] + ";");
-                    tempMet.push("vc" + (--varIf) + " = " + "vc" + (varIf) + " " + partes[3] + " vc" + (++varIf) + ";");
-                    tempMet.push("if(!vc" + (--varIf) + ")");
-                    tempMet.push("goto Else" + ++conIf + ";");     
-                    pilaContexto.push("If" + conIf);
+                    String[] partes = mensaje.split(" ");                  
+                    pilaInterm.push("vc" + (++varIf) + " = " + partes[2] + ";");
+                    if(!varCodin.contains("int vc" + varIf + ";")) {
+                        varCodin.add("int vc" + varIf + ";");
+                        expPosfija.push("int vc" + varIf + ";");
+                    }
+                    pilaInterm.push("vc" + (++varIf) + " = " + partes[4] + ";");                    
+                    if(!varCodin.contains("int vc" + varIf + ";")) {
+                        varCodin.add("int vc" + varIf + ";");
+                        expPosfija.push("int vc" + varIf + ";");
+                    }
+                    pilaInterm.push("vc" + (--varIf) + " = " + "vc" + (varIf) + " " + partes[3] + " vc" + (++varIf) + ";");
+                    pilaInterm.push("if(!vc" + (--varIf) + ")");
+                    pilaInterm.push("goto Else" + ++conIf + ";");     
+                    pilaContexto.push("If" + conIf);                                
                     break;
+                    
                 case "while":
                     mensaje = token + " ";
                     do {
-                        mensaje += auxiliar.pop() + " ";
-                    } while(!auxiliar.peek().equals("{"));
+                        mensaje += temporal.pop() + " ";
+                        auxiliar.pop();
+                    } while(!temporal.peek().equals("{"));
                     
                     String[] partesw = mensaje.split(" ");
-                    tempMet.push("While" + ++conWhile + ":");
-                    tempMet.push("vw" + (++varWhile) + " = " + partesw[2] + ";");
-                    tempMet.push("vw" + (++varWhile) + " = " + partesw[4] + ";");
-                    tempMet.push("vw" + (--varWhile) + " = " + "vw" + varWhile + " " + partesw[3] + " vw" + (++varWhile) + ";");
-                    tempMet.push("if(!vw" + (--varWhile) + ")");
-                    tempMet.push("goto Fin_While" + conWhile);
+                    pilaInterm.push("While" + ++conWhile + ":");
+                    pilaInterm.push("vw" + (++varWhile) + " = " + partesw[2] + ";");
+                    if(!varCodin.contains("int vw" + varWhile + ";")) {
+                        varCodin.add("int vw" + varWhile + ";");
+                        expPosfija.push("int vw" + varWhile + ";");
+                    }
+                    pilaInterm.push("vw" + (++varWhile) + " = " + partesw[4] + ";");
+                    if(!varCodin.contains("int vw" + varWhile + ";")) {
+                        varCodin.add("int vw" + varWhile + ";");
+                        expPosfija.push("int vw" + varWhile + ";");
+                    }
+                    pilaInterm.push("vw" + (--varWhile) + " = " + "vw" + varWhile + " " + partesw[3] + " vw" + (++varWhile) + ";");
+                    pilaInterm.push("if(!vw" + (--varWhile) + ")");
+                    pilaInterm.push("goto Fin_While" + conWhile + ";");
                     pilaContexto.push("While" + conWhile);
                     break;
                     
@@ -652,13 +675,13 @@ public class IDE extends javax.swing.JFrame
                 if(!pilaContexto.isEmpty()) {
                     String contexto = pilaContexto.pop();
                     if(contexto.startsWith("If")) {
-                        tempMet.push("goto End_If" + contexto.substring(2) + ";"); 
-                        tempMet.push("Else" + contexto.substring(2) + ":");
-                        tempMet.push("goto End_If" + contexto.substring(2) + ";");
-                        tempMet.push("End_If" + contexto.substring(2) + ":");                        
+                        pilaInterm.push("goto End_If" + contexto.substring(2) + ";"); 
+                        pilaInterm.push("Else" + contexto.substring(2) + ":");
+                        pilaInterm.push("goto End_If" + contexto.substring(2) + ";");
+                        pilaInterm.push("End_If" + contexto.substring(2) + ":");                        
                     } else if (contexto.startsWith("While")) {
-                        tempMet.push("goto While" + contexto.substring(5) + ";");
-                        tempMet.push("Fin_While" + contexto.substring(5) + ":");
+                        pilaInterm.push("goto While" + contexto.substring(5) + ";");
+                        pilaInterm.push("Fin_While" + contexto.substring(5) + ":");
                     }
                 }
                 break;
@@ -680,80 +703,6 @@ public class IDE extends javax.swing.JFrame
             default:
                 error = "No se puede imprimir un método.";
                 return ""; 
-        }
-    }
-    
-    private void pilaMain()
-    {
-        String token, mensaje, temp;
-        boolean ini = false;
-        int conIf = 0, conWhile = 0, varIf = 0, varWhile = 0;
-        Stack<String> pilaContexto = new Stack<>();
-        
-        while(!tempMain.isEmpty())
-            auxiliar.push(tempMain.pop());
-        
-        tempMain.push("\n" + auxiliar.pop());
-        while(!auxiliar.isEmpty()) {
-            while(!ini) {
-                token = auxiliar.pop();
-                if(token.equals("{")) {
-                    ini = true;
-                    break;
-                }       
-            }
-            token = auxiliar.pop();
-            
-            switch(token) {                
-                case "if":
-                    mensaje = token + " ";
-                    do {
-                        mensaje += auxiliar.pop() + " ";
-                    } while(!auxiliar.peek().equals("{")); 
-                    
-                    String[] partes = mensaje.split(" ");
-                    tempMain.push("vc" + (++varIf) + " = " + partes[2] + ";");
-                    tempMain.push("vc" + (++varIf) + " = " + partes[4] + ";");
-                    tempMain.push("vc" + (--varIf) + " = " + "vc" + (varIf) + " " + partes[3] + " vc" + (++varIf) + ";");
-                    tempMain.push("if(!vc" + (--varIf) + ")");
-                    tempMain.push("goto Else" + ++conIf + ";");     
-                    pilaContexto.push("If" + conIf);
-                    break;
-                case "while":
-                    mensaje = token + " ";
-                    do {
-                        mensaje += auxiliar.pop() + " ";
-                    } while(!auxiliar.peek().equals("{"));
-                    
-                    String[] partesw = mensaje.split(" ");
-                    tempMain.push("While" + ++conWhile + ":");
-                    tempMain.push("vw" + (++varWhile) + " = " + partesw[2] + ";");
-                    tempMain.push("vw" + (++varWhile) + " = " + partesw[4] + ";");
-                    tempMain.push("vw" + (--varWhile) + " = " + "vw" + varWhile + " " + partesw[3] + " vw" + (++varWhile) + ";");
-                    tempMain.push("if(!vw" + (--varWhile) + ")");
-                    tempMain.push("goto Fin_While" + conWhile);
-                    pilaContexto.push("While" + conWhile);
-                    break;
-                case "{":
-                    if(auxiliar.isEmpty())
-                        return;
-                    else
-                        break;
-                case "}":
-                if(!pilaContexto.isEmpty()) {
-                    String contexto = pilaContexto.pop();
-                    if(contexto.startsWith("If")) {
-                        tempMain.push("goto End_If" + contexto.substring(2) + ";"); 
-                        tempMain.push("Else" + contexto.substring(2) + ":");
-                        tempMain.push("goto End_If" + contexto.substring(2) + ";");
-                        tempMain.push("End_If" + contexto.substring(2) + ":");                        
-                    } else if (contexto.startsWith("While")) {
-                        tempMain.push("goto While" + contexto.substring(5) + ";");
-                        tempMain.push("Fin_While" + contexto.substring(5) + ":");
-                    }
-                }
-                break;
-            }
         }
     }
     
@@ -809,9 +758,9 @@ public class IDE extends javax.swing.JFrame
         return 0;
     }
     
-    private void codOper()
+    private void codOper(String token)
     {
-        int cont = 1;
+        int cont = 1;        
         
         while(!temp.isEmpty())
             aux.push(temp.pop());
@@ -819,35 +768,48 @@ public class IDE extends javax.swing.JFrame
         while(!aux.isEmpty()) {            
             String var = aux.pop();
             
-            if(var.matches("[a-zA-Z]+") || var.matches("\\d+")) {                
-                if(!expPosfija.peek().equals("int v" + cont + ";"))
+            if(var.matches("[a-zA-Z]+") || var.matches("\\d+(\\.\\d+)?")) {                                
+                if(!varCodin.contains("int v" + cont + ";")) {
+                    varCodin.add("int v" + cont + ";");
                     expPosfija.push("int v" + cont + ";");
+                }
                 pilaInterm.push("v" + cont++ + " = " + var + ";");                
-            }
-            else
-                switch(var) {
-                    case "+":
-                        cont -= 2;
-                        if(cont == 0)
-                            pilaInterm.push("v" + ++cont + " = +v" + cont + ";");
-                        else
-                            pilaInterm.push("v" + cont + " = v" + cont + " + v" + ++cont + ";");
-                        break;
-                    case "-":
-                        cont -= 2;
-                        if(cont == 0)
-                            pilaInterm.push("v" + ++cont + " = -v" + cont + ";"); 
-                        else
-                            pilaInterm.push("v" + cont + " = v" + cont + " - v" + ++cont + ";");
-                        break;
-                    case "/":
-                        cont -= 2;
-                        pilaInterm.push("v" + cont + " = v" + cont + " / v" + ++cont + ";");
-                        break;
-                    case "*":
-                        cont -= 2;
-                        pilaInterm.push("v" + cont + " = v" + cont + " * v" + ++cont + ";");                       
-                }            
+            } else
+                if(var.matches("\".*\"")) {
+                    pilaInterm.push("strcpy(" + token + ", " + var + ");");        
+                    cadena = true;
+                    return;
+                }
+                else
+                    if(var.matches("'.*'")) {
+                        pilaInterm.push(token + " = " + var + ";");
+                        cadena = true;
+                        return;
+                    }
+                    else
+                        switch(var) {
+                            case "+":
+                                cont -= 2;
+                                if(cont == 0)
+                                    pilaInterm.push("v" + ++cont + " = +v" + cont + ";");
+                                else
+                                    pilaInterm.push("v" + cont + " = v" + cont + " + v" + ++cont + ";");
+                                break;
+                            case "-":
+                                cont -= 2;
+                                if(cont == 0)
+                                    pilaInterm.push("v" + ++cont + " = -v" + cont + ";"); 
+                                else
+                                    pilaInterm.push("v" + cont + " = v" + cont + " - v" + ++cont + ";");
+                                break;
+                            case "/":
+                                cont -= 2;
+                                pilaInterm.push("v" + cont + " = v" + cont + " / v" + ++cont + ";");
+                                break;
+                            case "*":
+                                cont -= 2;
+                                pilaInterm.push("v" + cont + " = v" + cont + " * v" + ++cont + ";");                       
+                        }            
         }
         cont--;
         if(cont == 0)
@@ -1267,23 +1229,16 @@ public class IDE extends javax.swing.JFrame
         clearAllComp();
         clearVar();
         Lexico();
-        System.out.println("PILA Metodos");
-        for(String car : tempMet)
-            System.out.println(car);
-        System.out.println();
-        
-        System.out.println("PILA Main");
-        for(String car : tempMain)
-            System.out.println(car);
-        System.out.println();
-        
-        System.out.println("PILA VALORES Main");
-        for(String car : valMain)
-            System.out.println(car);
-        System.out.println();
         
         System.out.println("TABLA DE SIMBOLOS");
         for(String[] fila : tablaSim) {
+            for(String dato : fila)
+                System.out.print(dato + "\t");            
+            System.out.println();
+        }
+        System.out.println();
+        System.out.println("TABLA DE VALORES");
+        for(String[] fila : tablaVal) {
             for(String dato : fila)
                 System.out.print(dato + "\t");            
             System.out.println();
@@ -1321,16 +1276,19 @@ public class IDE extends javax.swing.JFrame
         tablaVal = new ArrayList<>();
         expPosfija.clear();
         tempMet.clear();
+        valMet.clear();
         tempMain.clear();
         valMain.clear();
         auxiliar.clear();
         variables.clear();
         pilaOpers.clear();
         pilaInterm.clear();
+        varCodin.clear();
         aux.clear();
         temp.clear();
         error = "";
         llaves = 0;
+        cadena = false;
         sint.Reinicio();
     }
     

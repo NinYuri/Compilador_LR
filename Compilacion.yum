@@ -4,7 +4,9 @@ public class Nombre
 	String nombre = "Ibarra";
 	char c;
 
-	public void Analizar() {}
+	public void Analizar() {
+		print("Ibarra");
+	}
 
 	void main() {
 		int val;
@@ -12,7 +14,14 @@ public class Nombre
 		String nom = "Yuri", pro = "Hola";
 		char car;
 
-		g = -(90+ (bi * 10/5) * 40);
+		//g = -(90+ (bi * 10/5) * 40);
+		//print("Res: " + g);
+		
+		//val = 90+6;
+		//bi  = 0.9;
+		nom = "Yuriana";
+		car = 'a';
+		//bi = 9.0/5;
 
 		/*print(pro + " un gusto " + nom);
 		print();
@@ -20,16 +29,30 @@ public class Nombre
 		print(pro + " un gusto");
 		print(nom + pro);
 		print("Yuriana" + pro);
-		print("Hola" + "Yuri"+ pro);*/
-		
+		print("Hola" + "Yuri"+ pro);
 		
 		Analizar();
-		Analizar = read();
-		//g = read();
-		//nombre = read();
-		//c = read();
+		val = read();
+		g = read();
+		nombre = read();
+		c = read();*/
 
-		//if(a > b)
-		//{}
+		/*if(g >= 90)
+		{
+			val = read();
+			nom = "Yuriana";
+			Analizar();
+			//if(b == 0){}
+		}*/
+
+		while(a != 2) {
+			a = a + 1;
+			print(a);
+			if(a > 0){
+			print("Yuri");
+			}
+		}
+
+		print("Hola");
 	}
 }

@@ -271,7 +271,7 @@ public class Sintactico
                         return;
                     }
                 }
-                if((pila.peek().equals("I46") || pila.peek().equals("I56") || pila.peek().equals("I121") || pila.peek().equals("I100")) && token.equals("id")) {                   
+                if((pila.peek().equals("I46") || pila.peek().equals("I56") || pila.peek().equals("I60") || pila.peek().equals("I121") || pila.peek().equals("I100")) && token.equals("id")) {                   
                     varAsig = buscarTipo(datoVar);
                     variable = datoVar;
                 }
