@@ -1,0 +1,103 @@
+/* EJEMPLO 1 */
+public class SumaProducto
+{
+	int i, suma, producto;
+
+	void main() 
+	{    		
+    		i = 1;
+    		suma = 0;
+    		producto = 1;
+
+		while(i <= 5) {
+        	 	    suma = suma + i;
+        		    producto = producto * i;
+
+        		    if(i == 3) {
+            	   	         print("Número especial: " + i);
+        		    }
+
+        		    i = i + 1;
+    		}
+
+    		print("Suma total: " + suma);
+    		print("Producto total: " + producto);
+	}
+}
+
+/* EJEMPLO 2 */
+public class Fibonacci 
+{
+	public void Calculo()
+	{
+		int a, b, c;
+    		a = 0;
+    		b = 1;
+
+		print(a);
+    		print(b);
+
+    		while(b < 100) {
+        		     c = a + b;
+        		     if(c < 100) {
+	                   print(c);
+        		}
+        		    a = b;
+        		    b = c;
+    		}
+	}
+
+	void main() 
+	{
+		Calculo();    	 	
+	}
+}
+
+/* EJEMPLO 3 */
+public class Promedio
+{
+	int promedio;
+	String materia;
+
+	public void leerDato() 
+	{
+		int cont = 1, valor;
+		
+		print("¿Por qué materia estás aquí?");
+		materia = read();
+		
+		print();
+		print("Comprendo...");
+		while(cont != 5) {
+    			print("Introduce calificación de Unidad " + cont);
+    			valor = read();
+			promedio = promedio + valor;
+			cont = cont + 1;
+		}
+	}
+
+	void main() {
+		char r = 's';
+
+		print("Bienvenido!");
+		while(r == 's') {
+			leerDato();
+			promedio = promedio / 4;
+			print("Tu promedio es: " + promedio);
+			if(promedio >= 70) {
+				print("Felicidades!! Aprobaste la materia de " + materia);
+			}
+			if(promedio < 70) {
+				print("Bueno, ya ni modo.");
+			}
+
+			print("¿Deseas calcular el promedio de otra materia? (s)");
+			r = read();
+		}
+		
+		if(r != 's') {
+			print("Bueno, ¡adiós!");
+		}
+	}
+
+}

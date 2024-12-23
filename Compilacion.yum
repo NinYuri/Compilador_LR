@@ -1,58 +1,26 @@
-public class Nombre 
+public class Fibonacci 
 {
-	int a, b;
-	String nombre = "Ibarra";
-	char c;
+	public void Calculo()
+	{
+		int a, b, c;
+    		a = 0;
+    		b = 1;
 
-	public void Analizar() {
-		print("Ibarra");
+		print(a);
+    		print(b);
+
+    		while(b < 100) {
+        		     c = a + b;
+        		     if(c < 100) {
+	                   print(c);
+        		}
+        		    a = b;
+        		    b = c;
+    		}
 	}
 
-	void main() {
-		int val;
-		float bi = 9.0, g;
-		String nom = "Yuri", pro = "Hola";
-		char car;
-
-		//g = -(90+ (bi * 10/5) * 40);
-		//print("Res: " + g);
-		
-		//val = 90+6;
-		//bi  = 0.9;
-		nom = "Yuriana";
-		car = 'a';
-		//bi = 9.0/5;
-
-		/*print(pro + " un gusto " + nom);
-		print();
-		print(nom);
-		print(pro + " un gusto");
-		print(nom + pro);
-		print("Yuriana" + pro);
-		print("Hola" + "Yuri"+ pro);
-		
-		Analizar();
-		val = read();
-		g = read();
-		nombre = read();
-		c = read();*/
-
-		/*if(g >= 90)
-		{
-			val = read();
-			nom = "Yuriana";
-			Analizar();
-			//if(b == 0){}
-		}*/
-
-		while(a != 2) {
-			a = a + 1;
-			print(a);
-			if(a > 0){
-			print("Yuri");
-			}
-		}
-
-		print("Hola");
+	void main() 
+	{
+		Calculo();    	 	
 	}
 }

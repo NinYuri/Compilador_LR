@@ -34,7 +34,7 @@ public class IDE extends javax.swing.JFrame
     Stack<String> pilaInterm = new Stack<>();
     List<String> varCodin = new ArrayList<>();
     String error = "";
-    int llaves = 0;
+    int llaves = 0, conIf = 0, conWhile = 0;
     boolean cadena = false;
     
     public IDE() 
@@ -90,14 +90,14 @@ public class IDE extends javax.swing.JFrame
                     }                                                                               
                     texto.append("$I0CLASS'");
                     jTPSintactico.setText(texto.toString());
-                    
-                    codInter();
+                                        
+                    codInter();                    
                     if(error.equals("")) {
                         for(String var : expPosfija)
                             codInt.append(var).append("\n");
                         jTPCodInt.setText(codInt.toString());
                     } else {
-                        jTPError.setText("Error semántico en la línea " + (c.linea + 1) + ": " + error);
+                        jTPError.setText("Error semántico: " + error);
                         return;
                     }
                     
@@ -129,7 +129,7 @@ public class IDE extends javax.swing.JFrame
                                 Tabla(String.valueOf(token), String.valueOf(lexer.lexeme), c.linea);
                                 sint.Tabla(tablaSim);
                                 sint.ID(lexer.lexeme);
-                                tempMet.push("Etq" + String.valueOf(lexer.lexeme) + ":");
+                                tempMet.push("Etiq" + String.valueOf(lexer.lexeme) + ":");
                                 banMet = true;
                                 token = Tokens.id;                               
                             }                            
@@ -200,7 +200,7 @@ public class IDE extends javax.swing.JFrame
                         resLexico += lexer.lexeme + "\n";
                         sint.Sintactico(String.valueOf(lexer.lexeme));
                         Tabla(String.valueOf(token), String.valueOf(lexer.lexeme), c.linea);
-                        tempMain.push("Etq" + String.valueOf(lexer.lexeme) + ":");
+                        tempMain.push("Etiq" + String.valueOf(lexer.lexeme) + ":");
                         banMain = true;
                         banMet = false;
                         break;
@@ -403,7 +403,7 @@ public class IDE extends javax.swing.JFrame
     {
         String token, valor, mensaje = "", dato;
         boolean ini = false, ban = false, inCad = false;
-        int conIf = 0, conWhile = 0, varIf = 0, varWhile = 0, endIndex;
+        int varIf = 0, varWhile = 0, endIndex;
         Stack<String> pilaContexto = new Stack<>();
         Stack<String> temporal = new Stack<>();
         auxiliar.clear();
@@ -1288,6 +1288,8 @@ public class IDE extends javax.swing.JFrame
         temp.clear();
         error = "";
         llaves = 0;
+        conIf = 0; 
+        conWhile = 0;
         cadena = false;
         sint.Reinicio();
     }
